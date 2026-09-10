@@ -35,6 +35,8 @@ namespace Garganta.UI
             GUI.enabled = true;
             GUILayout.Space(8);
             if (GUILayout.Button("Bastion (Base)", GUILayout.Height(40))) flow.ToBase();
+            if (GUILayout.Button("Skirmish (training, repeatable)", GUILayout.Height(32))) flow.StartSkirmish();
+            if (save.hasEnding && GUILayout.Button("Primeval Lair (superboss)", GUILayout.Height(32))) flow.StartPrimeval();
             if (GUILayout.Button("Back to Title")) flow.ToTitle();
             GUILayout.EndVertical();
             GUILayout.EndArea();

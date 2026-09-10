@@ -28,6 +28,9 @@ namespace Garganta.Data
         public string[] EnemyIds;
         public string[] RecruitIds; // parallel to EnemyIds ("" = not recruitable)
         public int EnemyLevel;
+        public int[] EnemyLvls; // optional per-enemy override
+        public string[] Wave2Ids; // reinforcements when the first force falls
+        public int Wave2Level;
         public string[] PreJoins; // roster ids joining before this battle
         public string[] Unlocks; // roster ids joining after victory
         public ChapterChoice Choice;
@@ -201,6 +204,87 @@ namespace Garganta.Data
                 Post = new[] {
                     "Zara: The gate holds. ...Strange. For the first time in years, somewhere feels worth defending.",
                     "Kael: Rest. Act II looms — and the Blight Heart beats louder every night.",
+                },
+            },
+            new ChapterConfig {
+                Id = "ch8", Title = "Ch.8 — All-Out War", Subtitle = "Valenwood Approach",
+                MapVariant = 1, Tutorial = false,
+                PlayerIds = new[] { "Kael", "Briar", "Sera", "Voss", "Dawn", "Renn" },
+                EnemyIds = new[] { "Bandit", "RogueKnight", "Hunter", "Shaman", "Orc", "Skeleton" },
+                RecruitIds = new string[0], EnemyLevel = 7,
+                Wave2Ids = new[] { "Orc", "Wolf" }, Wave2Level = 7,
+                PreJoins = new string[0], Unlocks = new[] { "Asha", "Vael" },
+                Pre = new[] {
+                    "Dawn: Three fronts, one dawn. The Alliance commits everything.",
+                    "Asha: ...The forest sent me. It whispers your names, ash-man.",
+                    "Vael: And where the forest goes, its spears follow. Try to keep up!",
+                },
+                Post = new[] {
+                    "Asha: The wilds choose their own. I choose you.",
+                    "Vael: Ha! Did you see that jump? The bards will weep.",
+                    "SYSTEM: Asha and Vael joined the party!",
+                },
+            },
+            new ChapterConfig {
+                Id = "ch9", Title = "Ch.9 — Blight Heart", Subtitle = "Ashfield Ruins",
+                MapVariant = 0, Tutorial = false,
+                PlayerIds = new[] { "Kael", "Thorne", "Sera", "Nyx", "Briar" },
+                EnemyIds = new[] { "BlightWalker", "BlightWalker", "BlightWalker", "BlightHeart" },
+                RecruitIds = new string[0], EnemyLevel = 9,
+                Wave2Ids = new[] { "BlightWalker", "BlightWalker" }, Wave2Level = 9,
+                PreJoins = new[] { "Thorne" },
+                Unlocks = new string[0],
+                Choice = new ChapterChoice {
+                    Prompt = "A Shadow assassin offers silent service.",
+                    AText = "Accept Nyx (Shadow +2)", BText = "Refuse (+500G, Dominion +2)",
+                    AFaction = "Shadow", APts = 2, BFaction = "Dominion", BPts = 2,
+                    AGold = 0, BGold = 500, AJoin = "Nyx", BJoin = "",
+                },
+                Pre = new[] {
+                    "Thorne: I built half of what guards that Heart. I know how to unbuild it.",
+                    "Kael: A defector. Why should we trust you?",
+                    "Thorne: Don't. Just point me at it, and try not to die.",
+                    "Nyx: ...The Court sends regards. And a blade. Take both, or neither.",
+                },
+                Post = new[] {
+                    "Thorne: The Heart cracks. It SCREAMS, ash-man. Can you hear it?",
+                    "Sera: Something vast just noticed us. We must hurry.",
+                },
+            },
+            new ChapterConfig {
+                Id = "ch10", Title = "Ch.10 — Unity", Subtitle = "Ironhold Checkpoint",
+                MapVariant = 2, Tutorial = false,
+                PlayerIds = new[] { "Kael", "Eos", "Dawn", "Voss", "Briar" },
+                EnemyIds = new[] { "RogueKnight", "RogueKnight", "Cultist", "Cultist", "Grim" },
+                RecruitIds = new[] { "", "", "", "", "Grim" }, EnemyLevel = 8,
+                PreJoins = new[] { "Eos" },
+                Unlocks = new string[0],
+                Pre = new[] {
+                    "Eos: Children of five banners, hear me. The Aether does not care for your borders.",
+                    "Grim: GRIM CARE! Grim smash little knights! ...Unless little knights stronger?",
+                    "Briar: Big, scarred, and honest. I like him. Try Talk before steel?",
+                    "SYSTEM: Weaken Grim below 30% HP, then use Talk!",
+                },
+                Post = new[] {
+                    "Eos: United at last. Every banner, one Bastion.",
+                    "Grim: Grim laugh! Grim stay! Grim... hungry.",
+                },
+            },
+            new ChapterConfig {
+                Id = "ch11", Title = "Ch.11 — Final Stand", Subtitle = "Aether Heart",
+                MapVariant = 2, Tutorial = false,
+                PlayerIds = new[] { "Kael", "Briar", "Sera", "Voss", "Dawn", "Eos" },
+                EnemyIds = new[] { "Usurper", "RogueKnight", "Hunter" },
+                RecruitIds = new string[0], EnemyLevel = 10, EnemyLvls = new[] { 12, 10, 10 },
+                Wave2Ids = new[] { "BlightWalker", "BlightWalker", "BlightWalker", "BlightWalker" }, Wave2Level = 10,
+                PreJoins = new string[0], Unlocks = new string[0],
+                Pre = new[] {
+                    "Usurper: Little ashes. You crawled all this way just to kneel.",
+                    "Kael: No more words. For Garganta — for EVERYONE we buried — attack!",
+                },
+                Post = new[] {
+                    "Usurper: Impossible... I... was... eternal...",
+                    "Kael: Nothing built on suffering ever is.",
                 },
             },
         };

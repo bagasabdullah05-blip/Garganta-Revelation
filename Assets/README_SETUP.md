@@ -1,4 +1,4 @@
-# Setup & Play — Garganta Revelation M4 (Unity 6000.6.0f1, 2D URP-ready)
+# Setup & Play — Garganta Revelation M5 (Unity 6000.6.0f1, 2D URP-ready)
 
 Packages (Unity 6): `feature.2d 2.0.1`, `2d.tilemap.extras 4.0.2`,
 `render-pipelines.universal 17.2.1`, `inputsystem 1.20.0`, `cinemachine 3.1.2`,
@@ -52,10 +52,23 @@ asset + HD-2D art final menyusul di M5.
   aura HP/ATK + bonus XP.
 - **Classic permadeath**: gugur (kecuali Kael) = keluar roster.
 
+## Sistem M5 (Ch.8–Ch.11 + endgame)
+- **Tier3 master jobs**: HolyKnight/Spellblade/Shadowblade/Seraph (syarat job J12+J12)
+  + 12 master skill (Judgment, ElementalSurge AoE, VoidStep, Grand Benediction...).
+- **Ch.8 All-Out War** (6v6 + wave bala bantuan, Asha & Vael gabung) → **Ch.9 Blight
+  Heart** (+Thorne, pilihan Nyx, boss BlightHeart 2 wave) → **Ch.10 Unity** (+Eos,
+  rekrut Grim via Talk) → **Ch.11 Final Stand** (boss Usurper lv12 + wave).
+- **5 endings**: True (15 rekrut) / Blight (corruption Kael) / Shadow / Sacrifice /
+  Light (faksi tertinggi); layar ending + stats.
+- **Skirmish** (grinding repeatable, scaling level party), **Primeval Lair**
+  (superboss post-ending), **NG+** (roster kept, musuh +2).
+- Roster final 15/15 sesuai PRD.
+
 ## Tests
 Window → General → Test Runner → EditMode → Run All.
-Harus hijau 62: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
+Harus hijau 77: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
 Skill(6), Equipment(6), Save(3), Chapter(5), Shop(5), Job(5), Bond(4),
-Corruption(3), Recruit(2), Rep(1) + 1 stub Addressables.
+Corruption(3), Recruit(2), Rep(1), Tier3(4), Ending(5), Skirmish(3), Wave(3)
++ 1 stub Addressables.
 Bisa juga headless:
 `Unity.exe -batchmode -quit -projectPath "K:\unity\Garganta-Revelation" -runTests -testPlatform EditMode -testResults results.xml`

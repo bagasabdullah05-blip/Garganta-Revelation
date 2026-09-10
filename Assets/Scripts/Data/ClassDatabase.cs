@@ -59,6 +59,19 @@ namespace Garganta.Data
             ["RuneKnight"] = new ClassRecord { Id = "RuneKnight", Name = "Rune Knight", Base = S(115, 15, 12, 12, 9, 7, 5, 1, WeaponType.Sword),
                 GHP = 8, GATK = 2, GDEF = 1, GMAG = 2, GMDEF = 1, GSPD = 1, Weapon = WeaponType.Sword,
                 Skills = new[] { "RunicBlade", "SpellWard", "AetherEdge" } },
+            // Tier 3 master (M5).
+            ["HolyKnight"] = new ClassRecord { Id = "HolyKnight", Name = "Holy Knight", Base = S(160, 18, 16, 10, 12, 7, 5, 1, WeaponType.Sword),
+                GHP = 12, GATK = 3, GDEF = 3, GMAG = 1, GMDEF = 2, GSPD = 1, Weapon = WeaponType.Sword,
+                Skills = new[] { "Judgment", "DivineGuard", "RadiantStrike" } },
+            ["Spellblade"] = new ClassRecord { Id = "Spellblade", Name = "Spellblade", Base = S(110, 18, 10, 22, 10, 10, 5, 2, WeaponType.Sword),
+                GHP = 7, GATK = 3, GDEF = 1, GMAG = 4, GMDEF = 2, GSPD = 2, Weapon = WeaponType.Sword,
+                Skills = new[] { "ElementalSurge", "EnchantBlade", "SpellStrike" } },
+            ["Shadowblade"] = new ClassRecord { Id = "Shadowblade", Name = "Shadowblade", Base = S(110, 20, 10, 10, 8, 16, 6, 1, WeaponType.Dagger),
+                GHP = 7, GATK = 3, GDEF = 1, GMAG = 1, GMDEF = 1, GSPD = 4, Weapon = WeaponType.Dagger,
+                Skills = new[] { "VoidStep", "UmbralSlash", "NightVeil" } },
+            ["Seraph"] = new ClassRecord { Id = "Seraph", Name = "Seraph", Base = S(105, 8, 10, 24, 18, 9, 4, 3, WeaponType.Staff),
+                GHP = 7, GATK = 1, GDEF = 2, GMAG = 4, GMDEF = 4, GSPD = 2, Weapon = WeaponType.Staff,
+                Skills = new[] { "Benediction2", "SeraphicWard", "Wrath" } },
         };
 
         public static ClassRecord Get(string id) => table.TryGetValue(id, out var r) ? r : table["Squire"];
@@ -76,6 +89,10 @@ namespace Garganta.Data
             ["BlackMage"] = new List<JobReq> { new JobReq { classId = "Mage", jobLevel = 10 }, new JobReq { classId = "Archer", jobLevel = 5 } },
             ["WhiteMage"] = new List<JobReq> { new JobReq { classId = "Acolyte", jobLevel = 10 }, new JobReq { classId = "Mage", jobLevel = 5 } },
             ["RuneKnight"] = new List<JobReq> { new JobReq { classId = "Squire", jobLevel = 10 }, new JobReq { classId = "Mage", jobLevel = 5 } },
+            ["HolyKnight"] = new List<JobReq> { new JobReq { classId = "Paladin", jobLevel = 12 }, new JobReq { classId = "Dragoon", jobLevel = 12 } },
+            ["Spellblade"] = new List<JobReq> { new JobReq { classId = "BlackMage", jobLevel = 12 }, new JobReq { classId = "RuneKnight", jobLevel = 12 } },
+            ["Shadowblade"] = new List<JobReq> { new JobReq { classId = "Assassin", jobLevel = 12 }, new JobReq { classId = "BlackMage", jobLevel = 12 } },
+            ["Seraph"] = new List<JobReq> { new JobReq { classId = "WhiteMage", jobLevel = 12 }, new JobReq { classId = "Paladin", jobLevel = 12 } },
         };
 
         public static List<JobReq> ReclassReqs(string classId)

@@ -29,6 +29,8 @@ namespace Garganta.Core
         CombatManager combat;
 
         HashSet<Vector2Int> moveRange = new HashSet<Vector2Int>();
+        ChapterConfig ActiveCfg;
+        bool WavePending;
 
         void Awake()
         {
@@ -81,6 +83,8 @@ namespace Garganta.Core
         public void StartBattle(ChapterConfig cfg)
         {
             ClearBattle();
+            ActiveCfg = cfg;
+            WavePending = cfg.Wave2Ids != null && cfg.Wave2Ids.Length > 0;
             grid.GenerateVariant(cfg.MapVariant);
             visual.Build(grid);
             SpawnRoster(cfg);
@@ -121,16 +125,42 @@ namespace Garganta.Core
             }
         }
 
+        static readonly Vector2Int[] EnemySlots = {
+            new Vector2Int(9, 9), new Vector2Int(10, 9), new Vector2Int(9, 10), new Vector2Int(10, 10),
+            new Vector2Int(8, 9), new Vector2Int(9, 8), new Vector2Int(7, 10), new Vector2Int(10, 7),
+        };
+
         void SpawnEnemies(ChapterConfig cfg)
         {
-            Vector2Int[] slots = { new Vector2Int(9, 9), new Vector2Int(10, 9), new Vector2Int(9, 10), new Vector2Int(10, 10), new Vector2Int(8, 9), new Vector2Int(9, 8) };
-            for (int i = 0; i < cfg.EnemyIds.Length && i < slots.Length; i++)
+            var save = SaveSystem.Current;
+            int ng = (save != null && save.ngPlus) ? 2 : 0;
+            for (int i = 0; i < cfg.EnemyIds.Length && i < EnemySlots.Length; i++)
             {
-                Unit u = UnitFactory.Create(cfg.EnemyIds[i], false, slots[i], grid);
+                Unit u = UnitFactory.Create(cfg.EnemyIds[i], false, EnemySlots[i], grid);
                 if (cfg.RecruitIds != null && i < cfg.RecruitIds.Length) u.RecruitId = cfg.RecruitIds[i];
-                if (cfg.EnemyLevel > 1) u.ApplyLevel(cfg.EnemyLevel);
+                int lv = (cfg.EnemyLvls != null && i < cfg.EnemyLvls.Length) ? cfg.EnemyLvls[i] : cfg.EnemyLevel;
+                if (lv + ng > 1) u.ApplyLevel(lv + ng);
                 EnemyUnits.Add(u);
             }
+        }
+
+        void SpawnWave()
+        {
+            var cfg = ActiveCfg;
+            var save = SaveSystem.Current;
+            int ng = (save != null && save.ngPlus) ? 2 : 0;
+            int n = 0;
+            for (int i = 0; i < cfg.Wave2Ids.Length && i < EnemySlots.Length; i++)
+            {
+                Vector2Int cell = EnemySlots[i];
+                var occ = grid.Tiles[cell.x, cell.y].Occupant;
+                if (occ != null && occ.IsAlive) continue;
+                Unit u = UnitFactory.Create(cfg.Wave2Ids[i], false, cell, grid);
+                if (cfg.Wave2Level + ng > 1) u.ApplyLevel(cfg.Wave2Level + ng);
+                EnemyUnits.Add(u);
+                n++;
+            }
+            EventBus.Log($"Reinforcements! ({n} foes)");
         }
 
         void Update()
@@ -294,7 +324,11 @@ namespace Garganta.Core
         public void CheckEnd()
         {
             if (State == GameState.Victory || State == GameState.Defeat) return;
-            if (!AnyAlive(EnemyUnits)) { AwardVictory(); SetState(GameState.Victory); }
+            if (!AnyAlive(EnemyUnits))
+            {
+                if (WavePending) { WavePending = false; SpawnWave(); return; }
+                AwardVictory(); SetState(GameState.Victory);
+            }
             else if (!AnyAlive(PlayerUnits)) SetState(GameState.Defeat);
         }
 

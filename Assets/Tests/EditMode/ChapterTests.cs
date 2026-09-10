@@ -9,7 +9,7 @@ public class ChapterTests
     [Test]
     public void Nodes_ValidContent()
     {
-        Assert.AreEqual(8, ChapterDatabase.NodeCount);
+        Assert.AreEqual(12, ChapterDatabase.NodeCount);
         for (int i = 0; i < ChapterDatabase.NodeCount; i++)
         {
             var n = ChapterDatabase.GetNode(i);

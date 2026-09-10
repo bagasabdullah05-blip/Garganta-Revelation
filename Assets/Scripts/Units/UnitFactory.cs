@@ -17,6 +17,8 @@ namespace Garganta.Units
             ["Orc"] = "Spearman", ["Imp"] = "Mage", ["Cultist"] = "Acolyte",
             ["RogueKnight"] = "Spearman", ["Hunter"] = "Archer", ["Shaman"] = "Mage",
             ["Zombie"] = "Spearman", ["Korr"] = "Spearman",
+            ["BlightWalker"] = "Spearman", ["BlightHeart"] = "Mage",
+            ["Usurper"] = "Assassin", ["Primeval"] = "Spearman",
         };
 
         static readonly Dictionary<string, string> unitWeapon = new Dictionary<string, string>
@@ -26,6 +28,7 @@ namespace Garganta.Units
             ["Imp"] = "grimoire", ["Cultist"] = "grimoire",
             ["RogueKnight"] = "battle_axe", ["Hunter"] = "short_bow", ["Shaman"] = "grimoire",
             ["Korr"] = "iron_lance",
+            ["BlightHeart"] = "void_tome", ["Usurper"] = "shadowfang", ["Primeval"] = "gungnir",
         };
 
         public static Unit Create(string id, bool isPlayer, Vector2Int coord, GridManager grid)

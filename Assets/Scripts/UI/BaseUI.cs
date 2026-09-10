@@ -181,7 +181,7 @@ namespace Garganta.UI
             foreach (var cls in u.known ?? new List<string>())
                 GUILayout.Label($"- {cls} job Lv{JobOf(u, cls)}");
             GUILayout.Label("Advanced jobs (job levels rise per battle survived):");
-            foreach (var target in new[] { "Paladin", "Dragoon", "Assassin", "BlackMage", "WhiteMage", "RuneKnight" })
+            foreach (var target in new[] { "Paladin", "Dragoon", "Assassin", "BlackMage", "WhiteMage", "RuneKnight", "HolyKnight", "Spellblade", "Shadowblade", "Seraph" })
             {
                 if (u.classId == target) continue;
                 var reqs = ClassDatabase.ReclassReqs(target);

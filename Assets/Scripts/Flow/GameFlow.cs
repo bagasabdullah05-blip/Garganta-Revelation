@@ -7,7 +7,7 @@ using Garganta.Units;
 
 namespace Garganta.Flow
 {
-    public enum FlowState { Title, Map, Base, Battle }
+    public enum FlowState { Title, Map, Base, Battle, Ending }
 
     // M3 meta flow: Title -> WorldMap <-> Bastion -> Battle (dialogue in/out) -> Map.
     public class GameFlow : MonoBehaviour
@@ -116,29 +116,106 @@ namespace Garganta.Flow
             EventBus.Log(pickA ? $"Chose: {c.AText}" : $"Chose: {c.BText}");
         }
 
+        string[] ActiveCfgPost = new string[0];
+        public Endings.Ending LastEnding;
+
         void OnBattleState(GameState s)
         {
-            if (State != FlowState.Battle || ActiveNode < 0 || gm == null) return;
-            var cfg = ChapterDatabase.GetNode(ActiveNode);
-            if (s == GameState.Victory)
+            if (State != FlowState.Battle || gm == null) return;
+            if (s == GameState.Defeat)
             {
                 if (tutor != null) tutor.End();
-                CaptureRoster();
+                return; // No persistent harm: next battle rebuilds from roster.
+            }
+            if (s != GameState.Victory) return;
+            if (tutor != null) tutor.End();
+            CaptureRoster();
+            var save = SaveSystem.Current;
+            if (ActiveNode >= 0)
+            {
+                var cfg = ChapterDatabase.GetNode(ActiveNode);
                 ApplyUnlocks(cfg);
-                var save = SaveSystem.Current;
                 if (save != null)
                 {
                     save.progress = Mathf.Max(save.progress, ActiveNode + 1);
                     SaveSystem.CaptureRuntime();
                     SaveSystem.Save(SaveSystem.LastSlot);
                 }
-                dlg.Play(cfg.Post, () => State = FlowState.Map);
+                if (ActiveNode >= ChapterDatabase.NodeCount - 1)
+                    dlg.Play(cfg.Post, ShowEnding);
+                else
+                    dlg.Play(cfg.Post, () => State = FlowState.Map);
             }
-            else if (s == GameState.Defeat)
+            else
             {
-                if (tutor != null) tutor.End();
-                // No persistent harm: next battle rebuilds from roster.
+                if (save != null) { SaveSystem.CaptureRuntime(); SaveSystem.Save(SaveSystem.LastSlot); }
+                if (ActiveCfgPost != null && ActiveCfgPost.Length > 0)
+                    dlg.Play(ActiveCfgPost, () => State = FlowState.Map);
+                else State = FlowState.Map;
             }
+        }
+
+        public void StartSkirmish()
+        {
+            var save = SaveSystem.Current;
+            if (save == null || gm == null) return;
+            var sk = SkirmishGen.Build(SkirmishGen.PartyAverage(save.roster), save.progress, System.DateTime.Now.Millisecond, save.ngPlus);
+            var ids = new List<string>();
+            foreach (var r in save.roster) { if (ids.Count >= 6) break; ids.Add(r.rosterId); }
+            ActiveNode = -2;
+            ActiveCfgPost = new string[0];
+            State = FlowState.Battle;
+            gm.StartBattle(new ChapterConfig
+            {
+                Id = "skirmish", Title = "Skirmish", Subtitle = "Training",
+                MapVariant = sk.MapVariant, PlayerIds = ids.ToArray(), EnemyIds = sk.EnemyIds,
+                RecruitIds = new string[0], EnemyLevel = sk.EnemyLevel,
+                PreJoins = new string[0], Unlocks = new string[0],
+                Pre = new string[0], Post = new string[0],
+            });
+        }
+
+        public void StartPrimeval()
+        {
+            var save = SaveSystem.Current;
+            if (save == null || gm == null) return;
+            var ids = new List<string>();
+            foreach (var r in save.roster) { if (ids.Count >= 6) break; ids.Add(r.rosterId); }
+            ActiveNode = -3;
+            ActiveCfgPost = new[] { "SYSTEM: The Primeval falls. Its hoard is yours — the legend grows." };
+            State = FlowState.Battle;
+            gm.StartBattle(new ChapterConfig
+            {
+                Id = "primeval", Title = "Primeval Lair", Subtitle = "Superboss",
+                MapVariant = 0, PlayerIds = ids.ToArray(),
+                EnemyIds = new[] { "Primeval", "BlightWalker", "BlightWalker" },
+                RecruitIds = new string[0], EnemyLevel = 12, EnemyLvls = new[] { 14, 12, 12 },
+                PreJoins = new string[0], Unlocks = new string[0],
+                Pre = new[] { "Primeval: WHO DARES? ...AH. LITTLE ASHES, GROWN FANGS.", "Kael: No words. End it." },
+                Post = ActiveCfgPost,
+            });
+        }
+
+        public void StartNewGamePlus()
+        {
+            var save = SaveSystem.Current;
+            if (save == null) return;
+            save.progress = 0;
+            save.ngPlus = true;
+            SaveSystem.Save(SaveSystem.LastSlot);
+            ActiveNode = -1;
+            State = FlowState.Map;
+        }
+
+        void ShowEnding()
+        {
+            var save = SaveSystem.Current;
+            int corr = 0;
+            foreach (var u in gm.PlayerUnits)
+                if (u.RosterId == "Kael") corr = u.Corruption;
+            LastEnding = Endings.Compute(save, corr);
+            if (save != null) { save.hasEnding = true; SaveSystem.Save(SaveSystem.LastSlot); }
+            State = FlowState.Ending;
         }
 
         void CaptureRoster()
@@ -175,6 +252,12 @@ namespace Garganta.Flow
                 case "Lyra": return U("Lyra", "Mage", 3, "grimoire", "", "", "");
                 case "Renn": return U("Renn", "Thief", 3, "", "", "", "");
                 case "Zara": return U("Zara", "Squire", 5, "iron_sword", "", "", "");
+                case "Asha": return U("Asha", "Archer", 7, "hunter_bow", "", "", "");
+                case "Vael": return U("Vael", "Dragoon", 8, "dragoon_lance", "", "", "");
+                case "Thorne": return U("Thorne", "BlackMage", 8, "void_tome", "", "", "");
+                case "Nyx": return U("Nyx", "Assassin", 8, "", "", "", "");
+                case "Eos": return U("Eos", "WhiteMage", 9, "light_staff", "", "", "");
+                case "Grim": return U("Grim", "Spearman", 8, "battle_axe", "", "", "");
                 default: return U(id, "Squire", 1, "rusty_sword", "", "", "");
             }
         }

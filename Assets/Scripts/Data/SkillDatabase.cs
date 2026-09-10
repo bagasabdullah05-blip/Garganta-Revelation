@@ -81,6 +81,19 @@ namespace Garganta.Data
             ["RunicBlade"] = new Skill { Id = "RunicBlade", Name = "Runic Blade", Effect = SkillEffect.Damage, Power = 1.4f, CostMP = 10, UnlockLevel = 1, Drain = true },
             ["SpellWard"] = new Skill { Id = "SpellWard", Name = "Spell Ward", Effect = SkillEffect.BuffDef, Power = 6, CostMP = 8, UnlockLevel = 3, SelfOnly = true, Duration = 3 },
             ["AetherEdge"] = D("AetherEdge", "Aether Edge", 1.8f, 14, 5, true),
+            // Tier 3 master (M5)
+            ["Judgment"] = D("Judgment", "Judgment", 2.5f, 22, 1, true),
+            ["DivineGuard"] = new Skill { Id = "DivineGuard", Name = "Divine Guard", Effect = SkillEffect.BuffDef, Power = 10, CostMP = 16, UnlockLevel = 3, TargetsAllies = true, AoE = 9, Duration = 1 },
+            ["RadiantStrike"] = D("RadiantStrike", "Radiant Strike", 1.8f, 12, 5),
+            ["ElementalSurge"] = new Skill { Id = "ElementalSurge", Name = "Elemental Surge", Effect = SkillEffect.Damage, Power = 1.8f, CostMP = 20, UnlockLevel = 1, Magical = true, AoE = 2 },
+            ["EnchantBlade"] = new Skill { Id = "EnchantBlade", Name = "Enchant Blade", Effect = SkillEffect.BuffAtk, Power = 8, CostMP = 12, UnlockLevel = 3, SelfOnly = true, Duration = 3 },
+            ["SpellStrike"] = D("SpellStrike", "Spell Strike", 2f, 16, 5),
+            ["VoidStep"] = new Skill { Id = "VoidStep", Name = "Void Step", Effect = SkillEffect.Damage, Power = 2f, CostMP = 16, UnlockLevel = 1, AlwaysHit = true },
+            ["UmbralSlash"] = new Skill { Id = "UmbralSlash", Name = "Umbral Slash", Effect = SkillEffect.Damage, Power = 1.6f, CostMP = 12, UnlockLevel = 3, StunTurns = 1 },
+            ["NightVeil"] = new Skill { Id = "NightVeil", Name = "Night Veil", Effect = SkillEffect.BuffEva, Power = 30, CostMP = 10, UnlockLevel = 5, SelfOnly = true, Duration = 2 },
+            ["Benediction2"] = new Skill { Id = "Benediction2", Name = "Grand Benediction", Effect = SkillEffect.Heal, Power = 80, HealIsPct = true, CostMP = 20, UnlockLevel = 1, Magical = true, TargetsAllies = true, Range = 3, AoE = 3 },
+            ["SeraphicWard"] = new Skill { Id = "SeraphicWard", Name = "Seraphic Ward", Effect = SkillEffect.BuffDef, Power = 8, CostMP = 14, UnlockLevel = 3, TargetsAllies = true, Range = 3, AoE = 3, Duration = 3 },
+            ["Wrath"] = D("Wrath", "Wrath", 2f, 18, 5, true),
         };
 
         public static Skill Get(string id) => table.TryGetValue(id, out var s) ? s : table["Attack"];

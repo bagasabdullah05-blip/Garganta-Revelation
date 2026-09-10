@@ -35,7 +35,7 @@ namespace Garganta.Editor
             Ensure("UI", typeof(UIManager), typeof(TurnOrderUI), typeof(UnitInfoUI),
                 typeof(ActionMenuUI), typeof(CombatUI), typeof(GameOverUI));
             Ensure("Flow", typeof(GameFlow), typeof(TitleUI), typeof(WorldMapUI),
-                typeof(BaseUI), typeof(DialogueUI), typeof(TutorialManager));
+                typeof(BaseUI), typeof(DialogueUI), typeof(TutorialManager), typeof(EndingsUI));
 
             EditorSceneManager.MarkSceneDirty(scene);
             Debug.Log("Garganta: TestBattle setup done. Save to Assets/Scenes/TestBattle.unity then Press Play.");
