@@ -15,7 +15,7 @@ namespace Garganta.Units
             for (int i = 1; i < path.Count; i++)
             {
                 Vector3 from = transform.position;
-                Vector3 to = grid.CoordToWorld(path[i]);
+                Vector3 to = grid.TileTop(path[i]);
                 float t = 0f;
                 while (t < 1f)
                 {

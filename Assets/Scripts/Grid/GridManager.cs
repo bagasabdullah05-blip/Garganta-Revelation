@@ -20,6 +20,10 @@ namespace Garganta.Grid
             return new Vector3(x, y, 0);
         }
 
+        public const float ElevY = 0.18f; // visual lift per elevation level (keeps click picking stable)
+
+        public Vector3 TileTop(Vector2Int c) => CoordToWorld(c) + new Vector3(0, Tiles[c.x, c.y].Elevation * ElevY, 0);
+
         public Vector2Int WorldToCoord(Vector3 w)
         {
             int row = Mathf.RoundToInt(w.y / 0.75f);

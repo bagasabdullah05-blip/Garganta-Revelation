@@ -1,15 +1,20 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Garganta.Art;
 using Garganta.Core;
 
 namespace Garganta.Grid
 {
-    // Placeholder visuals: staggered square sprites colored per TileType + highlight layer.
+    // 2D isometric look: diamond tiles, decorations, animated water/blight, Y depth.
     public class GridVisualizer : MonoBehaviour
     {
-        Sprite tileSprite;
         GameObject[,] highlights;
         GridManager grid;
+
+        readonly List<SpriteRenderer> waterTiles = new List<SpriteRenderer>();
+        readonly List<SpriteRenderer> blightTiles = new List<SpriteRenderer>();
+        float animT;
+        bool frame;
 
         static Sprite whiteSquare;
         public static Sprite WhiteSquare
@@ -37,26 +42,84 @@ namespace Garganta.Grid
                 for (int y = 0; y < g.Height; y++)
                 {
                     var t = g.Tiles[x, y];
+                    Vector3 pos = g.TileTop(t.Coord);
+                    int order = -200 + y * 2 + t.Elevation;
+
                     var go = new GameObject($"Tile_{x}_{y}");
-                    go.transform.position = g.CoordToWorld(t.Coord);
+                    go.transform.position = pos;
                     go.transform.SetParent(transform);
                     var sr = go.AddComponent<SpriteRenderer>();
-                    sr.sprite = WhiteSquare;
-                    sr.color = Balance.TileColor(t.Type);
-                    sr.sortingOrder = -1;
-                    // Elevation hint: shrink slightly per level
-                    float s = 0.95f - t.Elevation * 0.05f;
-                    go.transform.localScale = new Vector3(s, s * 0.75f, 1f);
+                    sr.sortingOrder = order;
+
+                    switch (t.Type)
+                    {
+                        case TileType.Water:
+                            sr.sprite = SpriteFactory.WaterDiamond(0);
+                            waterTiles.Add(sr);
+                            break;
+                        case TileType.Blight:
+                            sr.sprite = SpriteFactory.BlightDiamond(0);
+                            blightTiles.Add(sr);
+                            break;
+                        case TileType.Bridge:
+                            sr.sprite = SpriteFactory.BridgeDiamond();
+                            break;
+                        case TileType.Ruins:
+                            sr.sprite = SpriteFactory.RuinDiamond();
+                            break;
+                        case TileType.Wall:
+                            sr.sprite = SpriteFactory.WallBlock();
+                            sr.sortingOrder = order + 4;
+                            break;
+                        default:
+                            sr.sprite = SpriteFactory.Diamond(Balance.TileColor(t.Type));
+                            break;
+                    }
+
+                    AddDeco(t, pos, order);
 
                     var hl = new GameObject($"HL_{x}_{y}");
-                    hl.transform.position = go.transform.position;
+                    hl.transform.position = pos;
                     hl.transform.SetParent(go.transform);
                     var hsr = hl.AddComponent<SpriteRenderer>();
-                    hsr.sprite = WhiteSquare;
+                    hsr.sprite = SpriteFactory.Diamond(Color.white);
                     hsr.color = new Color(1, 1, 1, 0);
-                    hsr.sortingOrder = 5;
+                    hsr.sortingOrder = order + 3;
                     highlights[x, y] = hl;
                 }
+        }
+
+        void AddDeco(HexTile t, Vector3 pos, int order)
+        {
+            Sprite deco = null;
+            Vector3 off = Vector3.zero;
+            switch (t.Type)
+            {
+                case TileType.Forest: deco = SpriteFactory.Tree(); off = new Vector3(0, 0.55f, 0); break;
+                case TileType.Mountain: deco = SpriteFactory.Rock(); off = new Vector3(0, 0.28f, 0); break;
+                case TileType.Plains:
+                    if ((t.Coord.x * 7 + t.Coord.y * 13) % 5 == 0) { deco = SpriteFactory.Tuft(); off = new Vector3(0.1f, 0.1f, 0); }
+                    break;
+            }
+            if (deco == null) return;
+            var go = new GameObject($"Deco_{t.Coord.x}_{t.Coord.y}");
+            go.transform.position = pos + off;
+            go.transform.SetParent(transform);
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = deco;
+            sr.sortingOrder = order + 2;
+        }
+
+        void Update()
+        {
+            if (waterTiles.Count == 0 && blightTiles.Count == 0) return;
+            animT += Time.deltaTime;
+            if (animT < 0.45f) return;
+            animT = 0f;
+            frame = !frame;
+            int f = frame ? 1 : 0;
+            foreach (var sr in waterTiles) if (sr != null) sr.sprite = SpriteFactory.WaterDiamond(f);
+            foreach (var sr in blightTiles) if (sr != null) sr.sprite = SpriteFactory.BlightDiamond(f);
         }
 
         public void ShowRange(HashSet<Vector2Int> cells, Color c)

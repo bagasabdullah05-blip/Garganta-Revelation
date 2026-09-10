@@ -23,6 +23,7 @@ namespace Garganta.Editor
             }
             cam.orthographic = true;
             cam.orthographicSize = 7f;
+            cam.backgroundColor = new Color(0.10f, 0.10f, 0.18f); // Deep Black (ART_BRIEF)
             cam.transform.position = new Vector3(6, 4, -10);
             if (cam.GetComponent<IsometricCamera>() == null) cam.gameObject.AddComponent<IsometricCamera>();
             if (cam.GetComponent<CameraShake>() == null) cam.gameObject.AddComponent<CameraShake>();
@@ -34,6 +35,15 @@ namespace Garganta.Editor
 
             EditorSceneManager.MarkSceneDirty(scene);
             Debug.Log("Garganta: TestBattle setup done. Save to Assets/Scenes/TestBattle.unity then Press Play.");
+        }
+
+        // Headless: Unity -batchmode -executeMethod Garganta.Editor.SceneSetup.SetupAndSave -quit
+        public static void SetupAndSave()
+        {
+            Setup();
+            var scene = EditorSceneManager.GetActiveScene();
+            bool ok = EditorSceneManager.SaveScene(scene, "Assets/Scenes/TestBattle.unity");
+            Debug.Log("Garganta: TestBattle saved to Assets/Scenes/TestBattle.unity: " + ok);
         }
 
         static void Ensure(string name, params System.Type[] comps)
