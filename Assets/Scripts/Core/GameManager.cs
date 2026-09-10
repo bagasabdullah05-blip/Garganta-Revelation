@@ -42,6 +42,7 @@ namespace Garganta.Core
             visual = FindAnyObjectByType<GridVisualizer>();
             turns = FindAnyObjectByType<TurnManager>();
             combat = FindAnyObjectByType<CombatManager>();
+            if (Flow.GameFlow.Instance != null) return; // M3: flow drives battles
             SetupBattle();
         }
 
@@ -74,6 +75,64 @@ namespace Garganta.Core
             Vector2Int[] ePos = { new Vector2Int(9, 9), new Vector2Int(10, 9), new Vector2Int(9, 10), new Vector2Int(10, 10), new Vector2Int(8, 9), new Vector2Int(9, 8) };
             for (int i = 0; i < enemies.Length; i++)
                 EnemyUnits.Add(UnitFactory.Create(enemies[i], false, ePos[i], grid));
+        }
+
+        // M3 chapter battle: roster from save, map variant per chapter.
+        public void StartBattle(ChapterConfig cfg)
+        {
+            ClearBattle();
+            grid.GenerateVariant(cfg.MapVariant);
+            visual.Build(grid);
+            SpawnRoster(cfg);
+            SpawnEnemies(cfg);
+            var cam = Camera.main;
+            if (cam != null) cam.transform.position = grid.CoordToWorld(new Vector2Int(5, 5)) + new Vector3(0, 0, -10);
+            BattleReport = "";
+            SetState(GameState.PlayerTurn);
+            turns.Begin(PlayerUnits, EnemyUnits);
+            EventBus.Log($"Battle start: {cfg.Title} ({cfg.Subtitle})");
+        }
+
+        void ClearBattle()
+        {
+            foreach (var u in PlayerUnits) if (u != null) Destroy(u.gameObject);
+            foreach (var u in EnemyUnits) if (u != null) Destroy(u.gameObject);
+            PlayerUnits.Clear();
+            EnemyUnits.Clear();
+            SelectedUnit = null;
+            CurrentUnit = null;
+            if (visual != null)
+                foreach (Transform c in visual.transform) Destroy(c.gameObject);
+            CancelTargeting();
+        }
+
+        void SpawnRoster(ChapterConfig cfg)
+        {
+            var save = SaveSystem.Current;
+            Vector2Int[] slots = { new Vector2Int(1, 1), new Vector2Int(2, 1), new Vector2Int(1, 2), new Vector2Int(2, 2) };
+            int i = 0;
+            foreach (var pid in cfg.PlayerIds)
+            {
+                if (i >= slots.Length) break;
+                Unit u;
+                if (save != null && save.roster.Exists(r => r.rosterId == pid))
+                    u = UnitFactory.CreateFromSave(save.roster.Find(r => r.rosterId == pid), slots[i], grid, true);
+                else
+                    u = UnitFactory.Create(pid, true, slots[i], grid);
+                PlayerUnits.Add(u);
+                i++;
+            }
+        }
+
+        void SpawnEnemies(ChapterConfig cfg)
+        {
+            Vector2Int[] slots = { new Vector2Int(9, 9), new Vector2Int(10, 9), new Vector2Int(9, 10), new Vector2Int(10, 10), new Vector2Int(8, 9), new Vector2Int(9, 8) };
+            for (int i = 0; i < cfg.EnemyIds.Length && i < slots.Length; i++)
+            {
+                Unit u = UnitFactory.Create(cfg.EnemyIds[i], false, slots[i], grid);
+                if (cfg.EnemyLevel > 1) u.ApplyLevel(cfg.EnemyLevel);
+                EnemyUnits.Add(u);
+            }
         }
 
         void Update()

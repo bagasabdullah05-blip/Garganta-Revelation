@@ -33,9 +33,11 @@ namespace Garganta.Grid
             return new Vector2Int(col, row);
         }
 
-        public void Generate()
+        public void Generate() => GenerateVariant(0);
+
+        public void GenerateVariant(int variant)
         {
-            MapDatabase.GetM1(out TileType[,] types, out int[,] elev);
+            MapDatabase.GetMap(variant, out TileType[,] types, out int[,] elev);
             Width = types.GetLength(0);
             Height = types.GetLength(1);
             Tiles = new HexTile[Width, Height];

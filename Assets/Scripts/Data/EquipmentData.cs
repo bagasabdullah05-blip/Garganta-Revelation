@@ -135,6 +135,29 @@ namespace Garganta.Data
         public static Equipment FindAccessory(string id) => Find(Accessories, id);
         public static Consumable FindConsumable(string id) => Consumables.Find(c => c.Id == id);
 
+        // Search every gear list (base UI + roster restore).
+        public static Equipment FindAny(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return default;
+            foreach (var list in new[] { Weapons, Armors, Helmets, Accessories })
+            {
+                int i = list.FindIndex(e => e.Id == id);
+                if (i >= 0) return list[i];
+            }
+            return default;
+        }
+
+        public static string SlotName(EquipSlot s)
+        {
+            switch (s)
+            {
+                case EquipSlot.Weapon: return "Weapon";
+                case EquipSlot.Armor: return "Armor";
+                case EquipSlot.Helmet: return "Helmet";
+                default: return "Accessory";
+            }
+        }
+
         static Equipment Find(List<Equipment> list, string id)
         {
             int i = list.FindIndex(e => e.Id == id);

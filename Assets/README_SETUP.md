@@ -1,4 +1,4 @@
-# Setup & Play — Garganta Revelation M2 (Unity 6000.6.0f1, 2D URP-ready)
+# Setup & Play — Garganta Revelation M3 (Unity 6000.6.0f1, 2D URP-ready)
 
 Packages (Unity 6): `feature.2d 2.0.1`, `2d.tilemap.extras 4.0.2`,
 `render-pipelines.universal 17.2.1`, `inputsystem 1.20.0`, `cinemachine 3.1.2`,
@@ -13,9 +13,18 @@ asset + HD-2D art final menyusul di M5.
 
 ## Buat scene TestBattle
 1. File → New Scene (Basic Empty).
-2. Menu **Garganta → Setup TestBattle Scene**.
+2. Menu **Garganta → Setup TestBattle Scene** (menambah Battle + UI + Flow).
 3. File → Save As → `Assets/Scenes/TestBattle.unity`.
 4. Press Play.
+
+## Alur main (M3)
+- **Title**: New Game / Continue / Load slot 1-3.
+- **World Map**: node Ch.1 → Ch.2a → Ch.2b terbuka berurutan; klik node → dialogue
+  intro (Space/klik = lanjut, Skip >> tersedia) → battle.
+- **Battle**: sama seperti M2 + hint tutorial di Ch.1. Menang → XP/loot + dialogue
+  penutup + rekrut baru + auto-save → kembali ke Map. Kalah → ulang tanpa penalti.
+- **Bastion (Base)**: Party (lihat stats), Equip (ganti gear milik), Shop
+  (beli potion/gear pakai gold), Save (slot 1-3).
 
 ## Kontrol Play (M2)
 - Klik unit biru (punyamu, yang giliran `*` di bar atas) → highlight biru = move range.
@@ -31,7 +40,7 @@ asset + HD-2D art final menyusul di M5.
 
 ## Tests
 Window → General → Test Runner → EditMode → Run All.
-Harus hijau 34: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
-Skill(6), Equipment(6) + 1 stub Addressables.
+Harus hijau 47: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
+Skill(6), Equipment(6), Save(3), Chapter(5), Shop(5) + 1 stub Addressables.
 Bisa juga headless:
 `Unity.exe -batchmode -quit -projectPath "K:\unity\Garganta-Revelation" -runTests -testPlatform EditMode -testResults results.xml`

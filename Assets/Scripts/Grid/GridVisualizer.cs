@@ -37,6 +37,9 @@ namespace Garganta.Grid
         public void Build(GridManager g)
         {
             grid = g;
+            foreach (Transform child in transform) Destroy(child.gameObject);
+            waterTiles.Clear();
+            blightTiles.Clear();
             highlights = new GameObject[g.Width, g.Height];
             for (int x = 0; x < g.Width; x++)
                 for (int y = 0; y < g.Height; y++)

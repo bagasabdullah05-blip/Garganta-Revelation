@@ -9,6 +9,7 @@ namespace Garganta.Units
     public class Unit : MonoBehaviour
     {
         public string UnitName = "Unit";
+        public string RosterId; // save-system id (Kael, Briar, ...)
         public bool IsPlayer;
         public AIBehavior Behavior = AIBehavior.Aggressive;
         public string ClassId = "Squire";
@@ -80,24 +81,62 @@ namespace Garganta.Units
             if (!IsAlive || Level >= 50) return false;
             XP += amount;
             bool leveled = false;
-            var rec = ClassDatabase.Get(ClassId);
             while (Level < 50 && XP >= XpNeed(Level))
             {
                 XP -= XpNeed(Level);
-                Level++;
+                LevelUpOnce();
                 leveled = true;
-                CoreStats.MaxHP += rec.GHP;
-                CoreStats.ATK += rec.GATK;
-                CoreStats.DEF += rec.GDEF;
-                CoreStats.MAG += rec.GMAG;
-                CoreStats.MDEF += rec.GMDEF;
-                CoreStats.SPD += rec.GSPD;
-                HP += rec.GHP;
-                MaxMPFromMag();
-                MP = Stats.MaxMP;
             }
             if (leveled) RefreshStats();
             return leveled;
+        }
+
+        // Raise to an exact level (roster restore). No XP cost.
+        public void ApplyLevel(int target)
+        {
+            var rec = ClassDatabase.Get(ClassId);
+            while (Level < target && Level < 50) { Level++; ApplyGrowth(rec); }
+            RefreshStats();
+            HP = Stats.MaxHP;
+            MP = Stats.MaxMP;
+        }
+
+        void LevelUpOnce()
+        {
+            Level++;
+            ApplyGrowth(ClassDatabase.Get(ClassId));
+            MaxMPFromMag();
+            MP = Stats.MaxMP;
+        }
+
+        void ApplyGrowth(ClassRecord rec)
+        {
+            CoreStats.MaxHP += rec.GHP;
+            CoreStats.ATK += rec.GATK;
+            CoreStats.DEF += rec.GDEF;
+            CoreStats.MAG += rec.GMAG;
+            CoreStats.MDEF += rec.GMDEF;
+            CoreStats.SPD += rec.GSPD;
+            HP += rec.GHP;
+        }
+
+        public UnitSave Capture()
+        {
+            var save = new UnitSave
+            {
+                rosterId = RosterId,
+                classId = ClassId,
+                level = Level,
+                xp = XP,
+                mastery = new List<MasteryEntry>(),
+            };
+            foreach (var kv in Mastery)
+                save.mastery.Add(new MasteryEntry { classId = kv.Key, pct = kv.Value });
+            save.weaponId = Equipped.TryGetValue(EquipSlot.Weapon, out var w) ? w.Id : "";
+            save.armorId = Equipped.TryGetValue(EquipSlot.Armor, out var a) ? a.Id : "";
+            save.helmetId = Equipped.TryGetValue(EquipSlot.Helmet, out var h) ? h.Id : "";
+            save.accId = Equipped.TryGetValue(EquipSlot.Accessory, out var ac) ? ac.Id : "";
+            return save;
         }
 
         public int MasteryOf(string classId) => Mastery.TryGetValue(classId, out int v) ? v : 0;

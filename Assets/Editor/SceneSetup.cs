@@ -2,8 +2,10 @@ using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using Garganta.Core;
+using Garganta.Flow;
 using Garganta.Grid;
 using Garganta.Combat;
+using Garganta.Story;
 using Garganta.UI;
 
 namespace Garganta.Editor
@@ -32,6 +34,8 @@ namespace Garganta.Editor
                 typeof(TurnManager), typeof(CombatManager), typeof(ObjectPool));
             Ensure("UI", typeof(UIManager), typeof(TurnOrderUI), typeof(UnitInfoUI),
                 typeof(ActionMenuUI), typeof(CombatUI), typeof(GameOverUI));
+            Ensure("Flow", typeof(GameFlow), typeof(TitleUI), typeof(WorldMapUI),
+                typeof(BaseUI), typeof(DialogueUI), typeof(TutorialManager));
 
             EditorSceneManager.MarkSceneDirty(scene);
             Debug.Log("Garganta: TestBattle setup done. Save to Assets/Scenes/TestBattle.unity then Press Play.");
