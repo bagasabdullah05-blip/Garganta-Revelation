@@ -38,11 +38,11 @@ public class SkillTests
     public void UnlockedSkills_GatedByLevel()
     {
         var l1 = ClassDatabase.UnlockedSkills("Squire", 1);
-        Assert.AreEqual(2, l1.Count); // Attack + PowerStrike
+        Assert.AreEqual(3, l1.Count); // Attack + Talk + PowerStrike
         var l3 = ClassDatabase.UnlockedSkills("Squire", 3);
-        Assert.AreEqual(3, l3.Count); // + ShieldBash
+        Assert.AreEqual(4, l3.Count); // + ShieldBash
         var l10 = ClassDatabase.UnlockedSkills("Mage", 10);
-        Assert.AreEqual(5, l10.Count); // Attack + 4
+        Assert.AreEqual(6, l10.Count); // Attack + Talk + 4
     }
 
     [Test]

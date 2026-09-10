@@ -11,7 +11,7 @@ namespace Garganta.UI
         int tab;
         string selUnit = "Kael";
 
-        static readonly string[] shopConsumables = { "potion", "hi_potion", "ether", "antidote", "phoenix_down", "bomb" };
+        static readonly string[] shopConsumables = { "potion", "hi_potion", "ether", "antidote", "phoenix_down", "bomb", "aether_drop" };
         static readonly string[] shopGear =
         {
             "iron_sword", "steel_sword", "iron_lance", "partisan", "battle_axe",
@@ -34,6 +34,7 @@ namespace Garganta.UI
             if (GUILayout.Button("Equip")) tab = 1;
             if (GUILayout.Button("Shop")) tab = 2;
             if (GUILayout.Button("Save")) tab = 3;
+            if (GUILayout.Button("Jobs")) tab = 4;
             GUILayout.EndHorizontal();
 
             switch (tab)
@@ -42,6 +43,7 @@ namespace Garganta.UI
                 case 1: EquipTab(save); break;
                 case 2: ShopTab(save); break;
                 case 3: SaveTab(flow); break;
+                case 4: JobsTab(save); break;
             }
             if (GUILayout.Button("Back to Map", GUILayout.Height(32))) flow.ToMap();
             GUILayout.EndVertical();
@@ -54,7 +56,16 @@ namespace Garganta.UI
             {
                 var rec = ClassDatabase.Get(r.classId);
                 int need = Units.Unit.XpNeed(r.level);
-                GUILayout.Label($"{r.rosterId} [{rec.Name} Lv{r.level}] XP {r.xp}/{need}  gear: {GearName(r.weaponId)}/{GearName(r.armorId)}/{GearName(r.helmetId)}/{GearName(r.accId)}");
+                GUILayout.Label($"{r.rosterId} [{rec.Name} Lv{r.level}] XP {r.xp}/{need}  blight {r.corruption}%  gear: {GearName(r.weaponId)}/{GearName(r.armorId)}/{GearName(r.helmetId)}/{GearName(r.accId)}");
+            }
+            if (GUILayout.Button("Chapel: cleanse all corruption (free)"))
+            {
+                for (int i = 0; i < save.roster.Count; i++)
+                {
+                    var r = save.roster[i];
+                    r.corruption = 0;
+                    save.roster[i] = r;
+                }
             }
             GUILayout.Label("HP/MP fully restored at every battle. Victory auto-saves.");
         }
@@ -155,6 +166,44 @@ namespace Garganta.UI
                 case EquipSlot.Helmet: r.helmetId = id; break;
                 default: r.accId = id; break;
             }
+        }
+
+        void JobsTab(GameSave save)
+        {
+            GUILayout.BeginHorizontal();
+            foreach (var r in save.roster)
+                if (GUILayout.Button(r.rosterId)) selUnit = r.rosterId;
+            GUILayout.EndHorizontal();
+            int i = save.roster.FindIndex(r => r.rosterId == selUnit);
+            if (i < 0) { selUnit = save.roster[0].rosterId; return; }
+            var u = save.roster[i];
+            GUILayout.Label($"{u.rosterId}: {u.classId} (unit Lv{u.level})");
+            foreach (var cls in u.known ?? new List<string>())
+                GUILayout.Label($"- {cls} job Lv{JobOf(u, cls)}");
+            GUILayout.Label("Advanced jobs (job levels rise per battle survived):");
+            foreach (var target in new[] { "Paladin", "Dragoon", "Assassin", "BlackMage", "WhiteMage", "RuneKnight" })
+            {
+                if (u.classId == target) continue;
+                var reqs = ClassDatabase.ReclassReqs(target);
+                string req = string.Join(" + ", reqs.ConvertAll(q => $"{q.classId} J{q.jobLevel} (now {JobOf(u, q.classId)})").ToArray());
+                GUI.enabled = reqs.TrueForAll(q => JobOf(u, q.classId) >= q.jobLevel);
+                if (GUILayout.Button($"Reclass -> {target} [{req}]"))
+                {
+                    u.classId = target;
+                    if (!u.known.Contains(target)) u.known.Add(target);
+                    if (u.jobs.FindIndex(j => j.classId == target) < 0)
+                        u.jobs.Add(new JobEntry { classId = target, level = 1 });
+                    save.roster[i] = u;
+                }
+            }
+            GUI.enabled = true;
+        }
+
+        static int JobOf(UnitSave r, string cls)
+        {
+            if (r.jobs == null) return 0;
+            int k = r.jobs.FindIndex(j => j.classId == cls);
+            return k >= 0 ? r.jobs[k].level : 0;
         }
 
         static string GearName(string id) => string.IsNullOrEmpty(id) ? "-" : (EquipmentData.FindAny(id).Name ?? "-");

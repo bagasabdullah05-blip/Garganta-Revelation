@@ -85,6 +85,7 @@ namespace Garganta.Core
             visual.Build(grid);
             SpawnRoster(cfg);
             SpawnEnemies(cfg);
+            ApplySupportBonds();
             var cam = Camera.main;
             if (cam != null) cam.transform.position = grid.CoordToWorld(new Vector2Int(5, 5)) + new Vector3(0, 0, -10);
             BattleReport = "";
@@ -109,17 +110,13 @@ namespace Garganta.Core
         void SpawnRoster(ChapterConfig cfg)
         {
             var save = SaveSystem.Current;
-            Vector2Int[] slots = { new Vector2Int(1, 1), new Vector2Int(2, 1), new Vector2Int(1, 2), new Vector2Int(2, 2) };
+            Vector2Int[] slots = { new Vector2Int(1, 1), new Vector2Int(2, 1), new Vector2Int(1, 2), new Vector2Int(2, 2), new Vector2Int(1, 3), new Vector2Int(3, 1) };
             int i = 0;
             foreach (var pid in cfg.PlayerIds)
             {
                 if (i >= slots.Length) break;
-                Unit u;
-                if (save != null && save.roster.Exists(r => r.rosterId == pid))
-                    u = UnitFactory.CreateFromSave(save.roster.Find(r => r.rosterId == pid), slots[i], grid, true);
-                else
-                    u = UnitFactory.Create(pid, true, slots[i], grid);
-                PlayerUnits.Add(u);
+                if (save == null || !save.roster.Exists(r => r.rosterId == pid)) continue; // locked chars sit out
+                PlayerUnits.Add(UnitFactory.CreateFromSave(save.roster.Find(r => r.rosterId == pid), slots[i], grid, true));
                 i++;
             }
         }
@@ -130,6 +127,7 @@ namespace Garganta.Core
             for (int i = 0; i < cfg.EnemyIds.Length && i < slots.Length; i++)
             {
                 Unit u = UnitFactory.Create(cfg.EnemyIds[i], false, slots[i], grid);
+                if (cfg.RecruitIds != null && i < cfg.RecruitIds.Length) u.RecruitId = cfg.RecruitIds[i];
                 if (cfg.EnemyLevel > 1) u.ApplyLevel(cfg.EnemyLevel);
                 EnemyUnits.Add(u);
             }
@@ -300,8 +298,30 @@ namespace Garganta.Core
             else if (!AnyAlive(PlayerUnits)) SetState(GameState.Defeat);
         }
 
+        void ApplySupportBonds()
+        {
+            var save = SaveSystem.Current;
+            if (save == null) return;
+            foreach (var u in PlayerUnits)
+            {
+                int best = 0;
+                foreach (var a in PlayerUnits)
+                {
+                    if (a == u || string.IsNullOrEmpty(a.RosterId)) continue;
+                    best = Mathf.Max(best, Bonds.LevelBetween(save, u.RosterId, a.RosterId));
+                }
+                if (best > 0)
+                {
+                    u.Stats.MaxHP = Mathf.RoundToInt(u.Stats.MaxHP * (1f + 0.05f * best));
+                    u.Stats.ATK = Mathf.RoundToInt(u.Stats.ATK * (1f + 0.03f * best));
+                    u.HP = u.Stats.MaxHP;
+                }
+            }
+        }
+
         void AwardVictory()
         {
+            var save = SaveSystem.Current;
             var alive = PlayerUnits.FindAll(p => p.IsAlive);
             int xpEach = 0;
             foreach (var e in EnemyUnits) xpEach += 50 + e.Level * 25;
@@ -309,9 +329,23 @@ namespace Garganta.Core
             var lines = new List<string> { $"Victory! +{xpEach} XP each" };
             foreach (var p in alive)
             {
-                bool up = p.GainXP(xpEach);
+                int xp = (save != null && Bonds.HasBondedNeighbor(save, p, PlayerUnits))
+                    ? Mathf.RoundToInt(xpEach * 1.2f) : xpEach;
+                bool up = p.GainXP(xp);
                 p.AddMastery(p.ClassId, 5);
+                p.AddJobLevel(p.ClassId);
                 if (up) lines.Add($"{p.UnitName} reached Lv {p.Level}!");
+            }
+            if (save != null)
+            {
+                foreach (var n in Bonds.RecordBattle(save, PlayerUnits)) lines.Add(n);
+                // Classic permadeath: the fallen stay fallen — except Kael (story armor).
+                foreach (var u in PlayerUnits)
+                    if (!u.IsAlive && u.RosterId != "Kael")
+                    {
+                        save.roster.RemoveAll(r => r.rosterId == u.RosterId);
+                        lines.Add($"{u.RosterId} has fallen... (permadeath)");
+                    }
             }
             int gold = 0;
             foreach (var e in EnemyUnits) gold += Random.Range(10, 31);

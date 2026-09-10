@@ -33,7 +33,7 @@ namespace Garganta.UI
             GUILayout.BeginArea(new Rect(Screen.width - 250, Screen.height - 300, 242, 292));
             GUILayout.BeginVertical("box");
             GUILayout.Label($"Skills (MP {u.MP}/{u.Stats.MaxMP})");
-            foreach (var sk in ClassDatabase.UnlockedSkills(u.ClassId, u.Level))
+            foreach (var sk in ClassDatabase.UnlockedSkillsFor(u))
             {
                 GUI.enabled = u.MP >= sk.CostMP;
                 if (GUILayout.Button($"{sk.Name} ({sk.CostMP})")) { gm.SelectSkill(sk); menu = 0; }

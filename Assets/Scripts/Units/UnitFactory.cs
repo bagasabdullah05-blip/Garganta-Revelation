@@ -15,6 +15,8 @@ namespace Garganta.Units
             ["Kael"] = "Squire", ["Briar"] = "Squire", ["Sera"] = "Acolyte", ["Voss"] = "Archer",
             ["Bandit"] = "Thief", ["Goblin"] = "Thief", ["Wolf"] = "Thief", ["Skeleton"] = "Spearman",
             ["Orc"] = "Spearman", ["Imp"] = "Mage", ["Cultist"] = "Acolyte",
+            ["RogueKnight"] = "Spearman", ["Hunter"] = "Archer", ["Shaman"] = "Mage",
+            ["Zombie"] = "Spearman", ["Korr"] = "Spearman",
         };
 
         static readonly Dictionary<string, string> unitWeapon = new Dictionary<string, string>
@@ -22,6 +24,8 @@ namespace Garganta.Units
             ["Kael"] = "iron_sword", ["Briar"] = "hand_axe", ["Sera"] = "wooden_staff", ["Voss"] = "short_bow",
             ["Bandit"] = "rusty_sword", ["Skeleton"] = "wooden_spear", ["Orc"] = "hand_axe",
             ["Imp"] = "grimoire", ["Cultist"] = "grimoire",
+            ["RogueKnight"] = "battle_axe", ["Hunter"] = "short_bow", ["Shaman"] = "grimoire",
+            ["Korr"] = "iron_lance",
         };
 
         public static Unit Create(string id, bool isPlayer, Vector2Int coord, GridManager grid)
@@ -83,6 +87,11 @@ namespace Garganta.Units
             unit.ApplyLevel(Mathf.Max(1, save.level));
             unit.XP = save.xp;
             foreach (var m in save.mastery) unit.Mastery[m.classId] = m.pct;
+            unit.KnownClasses = new List<string>(save.known ?? new List<string>());
+            if (unit.KnownClasses.Count == 0) unit.KnownClasses.Add(unit.ClassId);
+            unit.JobLevels.Clear();
+            if (save.jobs != null) foreach (var j in save.jobs) unit.JobLevels[j.classId] = j.level;
+            unit.Corruption = save.corruption;
             Equip(unit, EquipSlot.Weapon, save.weaponId);
             Equip(unit, EquipSlot.Armor, save.armorId);
             Equip(unit, EquipSlot.Helmet, save.helmetId);

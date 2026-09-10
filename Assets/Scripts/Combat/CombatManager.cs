@@ -44,6 +44,35 @@ namespace Garganta.Combat
             return result;
         }
 
+        // Aether Corruption tiers per PRD 4.4: 0-24 / 25-49 / 50-74 / 75-99 / 100.
+        public static int CorruptionTier(int pct)
+        {
+            if (pct >= 100) return 4;
+            if (pct >= 75) return 3;
+            if (pct >= 50) return 2;
+            if (pct >= 25) return 1;
+            return 0;
+        }
+
+        public static void CorruptionMods(int pct, out float atkMult, out float defMult)
+        {
+            switch (CorruptionTier(pct))
+            {
+                case 4:
+                case 3: atkMult = 1.3f; defMult = 0.8f; break;
+                case 2: atkMult = 1.2f; defMult = 0.8f; break;
+                case 1: atkMult = 1.1f; defMult = 0.9f; break;
+                default: atkMult = 1f; defMult = 1f; break;
+            }
+        }
+
+        public static bool LoseTurnRoll(int corruption, float roll)
+        {
+            if (corruption >= 75) return roll < 0.3f;
+            if (corruption >= 50) return roll < 0.1f;
+            return false;
+        }
+
         public void Attack(Unit attacker, Unit defender)
         {
             if (Strike(attacker, defender, false, 1f, 0f, false) > 0)
@@ -63,7 +92,8 @@ namespace Garganta.Combat
             float elevAcc = attElev > defElev ? 10f : attElev < defElev ? -10f : 0f;
 
             int rawDef = (magical ? defender.Stats.MDEF : defender.Stats.DEF) + defender.BuffDef + tileDef;
-            int effDef = Mathf.Max(0, Mathf.RoundToInt(rawDef * (1f - ignoreDefPct)));
+            CorruptionMods(defender.Corruption, out _, out float defMult);
+            int effDef = Mathf.Max(0, Mathf.RoundToInt(rawDef * (1f - ignoreDefPct) * defMult));
             int effEva = defender.Stats.Eva + defender.BuffEva;
             int baseDmg = magical
                 ? MagicalBase(attacker.Stats.MAG + attacker.BuffMag, attacker.Stats.WeaponMult * power, effDef)
@@ -81,6 +111,8 @@ namespace Garganta.Combat
             }
 
             int dmg = Finalize(baseDmg, tri, elev, crit, variance);
+            CorruptionMods(attacker.Corruption, out float atkMult, out _);
+            dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * atkMult));
             defender.TakeDamage(dmg);
             EventBus.Damage(attacker.UnitName, dmg, defender.UnitName);
             EventBus.Log($"{attacker.UnitName} hit {defender.UnitName} for {dmg}{(crit ? " CRIT" : "")}");
@@ -117,6 +149,7 @@ namespace Garganta.Combat
                 {
                     case SkillEffect.Damage:
                         int dmg = Strike(caster, t, skill.Magical, skill.Power, skill.IgnoreDefPct, skill.AlwaysHit);
+                        if (skill.Drain && dmg > 0) caster.Heal(dmg / 2);
                         if (skill.StunTurns > 0 && t.IsAlive && dmg > 0)
                         {
                             t.StunTurns = skill.StunTurns;
@@ -134,9 +167,29 @@ namespace Garganta.Combat
                             ? Mathf.Max(1, Mathf.RoundToInt(t.Stats.MaxHP * skill.Power / 100f))
                             : HealAmount(caster.Stats.MAG + caster.BuffMag, skill.Power, StaffBonus(caster));
                         t.Heal(amt);
-                        if (skill.Cleanse) t.StunTurns = 0;
+                        if (skill.Cleanse)
+                        {
+                            t.StunTurns = 0;
+                            t.Corruption = Mathf.Max(0, t.Corruption - 25);
+                        }
                         Popup(t.transform.position, "+" + amt, Color.green);
                         EventBus.Log($"{caster.UnitName} heals {t.UnitName} for {amt}");
+                        break;
+                    case SkillEffect.Recruit:
+                        if (!string.IsNullOrEmpty(t.RecruitId) && t.HP * 100 / Mathf.Max(1, t.Stats.MaxHP) < 30)
+                        {
+                            foes.Remove(t);
+                            allies.Add(t);
+                            t.IsPlayer = true;
+                            t.RosterId = t.RecruitId;
+                            t.RecruitId = "";
+                            t.Behavior = Garganta.AI.AIBehavior.Aggressive;
+                            var rsr = t.GetComponent<SpriteRenderer>();
+                            if (rsr != null) rsr.color = Color.white;
+                            Popup(t.transform.position, "JOIN!", Color.cyan);
+                            EventBus.Log($"{t.UnitName} joins the party!");
+                        }
+                        else EventBus.Log($"{t.UnitName} won't listen...");
                         break;
                     case SkillEffect.BuffAtk: t.BuffAtk += (int)skill.Power; t.BuffTurns = skill.Duration; BuffLog(t, "ATK"); break;
                     case SkillEffect.BuffDef: t.BuffDef += (int)skill.Power; t.BuffTurns = skill.Duration; BuffLog(t, "DEF"); break;
@@ -192,6 +245,7 @@ namespace Garganta.Combat
             if (item.HealHP > 0) t.Heal(item.HealHP);
             if (item.HealMP > 0) t.MP = Mathf.Min(t.Stats.MaxMP, t.MP + item.HealMP);
             if (item.Cleanse) t.StunTurns = 0;
+            if (item.CorruptionCure > 0) t.Corruption = Mathf.Max(0, t.Corruption - item.CorruptionCure);
             Popup(t.transform.position, "+" + item.HealHP, Color.green);
             EventBus.Log($"{user.UnitName} used {item.Name} on {t.UnitName}");
         }

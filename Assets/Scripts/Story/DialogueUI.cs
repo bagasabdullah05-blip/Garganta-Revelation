@@ -36,7 +36,23 @@ namespace Garganta.Story
         public void Stop()
         {
             IsPlaying = false;
+            choiceMode = false;
             lines.Clear();
+        }
+
+        bool choiceMode;
+        string choicePrompt, choiceA, choiceB;
+        Action<bool> onPick;
+
+        // Moral / faction choice (M4). Calls back with true = option A.
+        public void PlayChoice(string prompt, string a, string b, Action<bool> pick)
+        {
+            Stop();
+            choiceMode = true;
+            choicePrompt = prompt;
+            choiceA = a;
+            choiceB = b;
+            onPick = pick;
         }
 
         void Update()
@@ -47,9 +63,16 @@ namespace Garganta.Story
                 Advance();
         }
 
-        void Advance()
+        void Pick(bool a)
         {
-            string full = lines[idx].text;
+            choiceMode = false;
+            var cb = onPick;
+            onPick = null;
+            cb?.Invoke(a);
+        }
+
+        void Advance()
+        {            string full = lines[idx].text;
             if (shown < full.Length) { shown = full.Length; return; }
             idx++;
             shown = 0f;
@@ -77,6 +100,17 @@ namespace Garganta.Story
 
         void OnGUI()
         {
+            if (choiceMode)
+            {
+                GUILayout.BeginArea(new Rect(Screen.width / 2 - 220, Screen.height / 2 - 80, 440, 170));
+                GUILayout.BeginVertical("box");
+                GUILayout.Label(choicePrompt);
+                if (GUILayout.Button("A: " + choiceA, GUILayout.Height(36))) Pick(true);
+                if (GUILayout.Button("B: " + choiceB, GUILayout.Height(36))) Pick(false);
+                GUILayout.EndVertical();
+                GUILayout.EndArea();
+                return;
+            }
             if (!IsPlaying || idx >= lines.Count) return;
             var (speaker, text) = lines[idx];
             int n = Mathf.Min(text.Length, (int)shown);

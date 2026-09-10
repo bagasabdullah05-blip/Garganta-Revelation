@@ -1,4 +1,4 @@
-# Setup & Play — Garganta Revelation M3 (Unity 6000.6.0f1, 2D URP-ready)
+# Setup & Play — Garganta Revelation M4 (Unity 6000.6.0f1, 2D URP-ready)
 
 Packages (Unity 6): `feature.2d 2.0.1`, `2d.tilemap.extras 4.0.2`,
 `render-pipelines.universal 17.2.1`, `inputsystem 1.20.0`, `cinemachine 3.1.2`,
@@ -38,9 +38,24 @@ asset + HD-2D art final menyusul di M5.
 - CTB: SPD tinggi jalan lebih sering. High ground +10% dmg/acc. Stun = giliran lewat.
 - Menang → layar hasil: XP + level-up + gold + loot. Kalah = party wipe.
 
+## Sistem M4 (Ch.3–Ch.7)
+- **Tier2 jobs**: Paladin/Dragoon/Assassin/BlackMage/WhiteMage/RuneKnight via tab
+  **Jobs** di Bastion — syarat job level ala FFT (mis. Paladin: Squire J10 + Acolyte J5);
+  job level +1 per battle. Reclass simpan skill lama + gear.
+- **Talk recruit**: skill Talk (range 1) ke musuh bertanda HP <30% (mis. Korr di Ch.5)
+  → gabung dan terbawa ke roster.
+- **Corruption**: tile Blight +10/turn; tier 25/50/75 = ATK+/DEF-/giliran hilang;
+  100% = mati dimakan Blight. Cure/Aether Drop/Chapel membersihkan.
+- **Choices & reputation**: Ch.3/4/7 ada pilihan A/B (pengaruh faksi + rekrutmen);
+  standing tampil di World Map, dipakai 5 endings (M6).
+- **Support bonds**: bertarung bersama/berdekatan menaikkan bond (C/B/A/S) →
+  aura HP/ATK + bonus XP.
+- **Classic permadeath**: gugur (kecuali Kael) = keluar roster.
+
 ## Tests
 Window → General → Test Runner → EditMode → Run All.
-Harus hijau 47: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
-Skill(6), Equipment(6), Save(3), Chapter(5), Shop(5) + 1 stub Addressables.
+Harus hijau 62: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
+Skill(6), Equipment(6), Save(3), Chapter(5), Shop(5), Job(5), Bond(4),
+Corruption(3), Recruit(2), Rep(1) + 1 stub Addressables.
 Bisa juga headless:
 `Unity.exe -batchmode -quit -projectPath "K:\unity\Garganta-Revelation" -runTests -testPlatform EditMode -testResults results.xml`

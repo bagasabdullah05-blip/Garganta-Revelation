@@ -27,6 +27,7 @@ namespace Garganta.Data
         public bool Revive;
         public bool Cleanse;
         public bool BombAll; // fixed damage to all enemies
+        public int CorruptionCure; // Aether Drop: -% corruption
         public int Price;
         public string Desc;
     }
@@ -127,6 +128,7 @@ namespace Garganta.Data
             new Consumable { Id = "phoenix_down", Name = "Phoenix Down", Revive = true, Price = 500, Desc = "Revive ally at 1 HP" },
             new Consumable { Id = "tent", Name = "Tent", HealHP = 9999, HealMP = 9999, Price = 1000, Desc = "Full restore" },
             new Consumable { Id = "bomb", Name = "Bomb", BombAll = true, Price = 200, Desc = "100 dmg to ALL enemies" },
+            new Consumable { Id = "aether_drop", Name = "Aether Drop", CorruptionCure = 25, Price = 400, Desc = "Cure 25% corruption" },
         };
 
         public static Equipment FindWeapon(string id) => Find(Weapons, id);

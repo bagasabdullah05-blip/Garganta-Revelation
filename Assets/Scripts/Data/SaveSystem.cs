@@ -54,7 +54,14 @@ namespace Garganta.Data
         }
 
         static UnitSave MakeUnit(string id, string cls, int lv, string w, string a, string h, string acc)
-            => new UnitSave { rosterId = id, classId = cls, level = lv, xp = 0, weaponId = w, armorId = a, helmetId = h, accId = acc, mastery = new List<MasteryEntry>() };
+            => new UnitSave
+            {
+                rosterId = id, classId = cls, level = lv, xp = 0, weaponId = w, armorId = a, helmetId = h, accId = acc,
+                mastery = new List<MasteryEntry>(),
+                jobs = new List<JobEntry> { new JobEntry { classId = cls, level = 1 } },
+                known = new List<string> { cls },
+                corruption = 0,
+            };
 
         // Push save -> runtime singletons (Inventory gold/stock).
         public static void ApplyToRuntime()

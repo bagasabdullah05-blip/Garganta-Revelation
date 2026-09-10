@@ -13,6 +13,10 @@ namespace Garganta.Units
         public bool IsPlayer;
         public AIBehavior Behavior = AIBehavior.Aggressive;
         public string ClassId = "Squire";
+        public List<string> KnownClasses = new List<string>();
+        public Dictionary<string, int> JobLevels = new Dictionary<string, int>();
+        public int Corruption; // 0-100 Aether corruption (M4)
+        public string RecruitId; // set on enemies that can be Talk-recruited (M4)
         public int Level = 1;
         public int XP = 0;
         public int MP;
@@ -44,7 +48,32 @@ namespace Garganta.Units
         public void SetClass(string classId)
         {
             ClassId = classId;
+            if (!KnownClasses.Contains(classId)) KnownClasses.Add(classId);
+            if (!JobLevels.ContainsKey(classId)) JobLevels[classId] = 1;
             MaxMPFromMag();
+            MP = Stats.MaxMP;
+        }
+
+        public int JobLevelOf(string classId) => JobLevels.TryGetValue(classId, out int v) ? v : 0;
+        public void AddJobLevel(string classId) => JobLevels[classId] = Mathf.Min(ClassDatabase.JobCap, JobLevelOf(classId) + 1);
+
+        // Barracks reclass: rebuild core stats from the new class, keep HP fraction + gear + skills.
+        public void ReclassTo(ClassRecord rec)
+        {
+            float frac = Stats.MaxHP > 0 ? (float)HP / Stats.MaxHP : 1f;
+            CoreStats = rec.Base.Clone();
+            for (int i = 1; i < Level; i++)
+            {
+                CoreStats.MaxHP += rec.GHP;
+                CoreStats.ATK += rec.GATK;
+                CoreStats.DEF += rec.GDEF;
+                CoreStats.MAG += rec.GMAG;
+                CoreStats.MDEF += rec.GMDEF;
+                CoreStats.SPD += rec.GSPD;
+            }
+            SetClass(rec.Id);
+            RefreshStats();
+            HP = Mathf.Max(1, Mathf.RoundToInt(Stats.MaxHP * frac));
             MP = Stats.MaxMP;
         }
 
@@ -129,7 +158,12 @@ namespace Garganta.Units
                 level = Level,
                 xp = XP,
                 mastery = new List<MasteryEntry>(),
+                jobs = new List<JobEntry>(),
+                known = new List<string>(KnownClasses),
+                corruption = Corruption,
             };
+            foreach (var kv in JobLevels)
+                save.jobs.Add(new JobEntry { classId = kv.Key, level = kv.Value });
             foreach (var kv in Mastery)
                 save.mastery.Add(new MasteryEntry { classId = kv.Key, pct = kv.Value });
             save.weaponId = Equipped.TryGetValue(EquipSlot.Weapon, out var w) ? w.Id : "";

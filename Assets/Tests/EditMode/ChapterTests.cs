@@ -9,7 +9,7 @@ public class ChapterTests
     [Test]
     public void Nodes_ValidContent()
     {
-        Assert.AreEqual(3, ChapterDatabase.NodeCount);
+        Assert.AreEqual(8, ChapterDatabase.NodeCount);
         for (int i = 0; i < ChapterDatabase.NodeCount; i++)
         {
             var n = ChapterDatabase.GetNode(i);
@@ -38,6 +38,8 @@ public class ChapterTests
         for (int i = 0; i < ChapterDatabase.NodeCount; i++)
         {
             var n = ChapterDatabase.GetNode(i);
+            if (n.PreJoins != null) foreach (var u in n.PreJoins) unlocked.Add(u);
+            if (n.HasChoice && !string.IsNullOrEmpty(n.Choice.AJoin)) unlocked.Add(n.Choice.AJoin);
             foreach (var p in n.PlayerIds)
                 Assert.Contains(p, unlocked.ToArray(), $"{n.Id} needs locked {p}");
             foreach (var u in n.Unlocks) unlocked.Add(u);

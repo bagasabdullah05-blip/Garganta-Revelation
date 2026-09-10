@@ -74,11 +74,46 @@ namespace Garganta.Flow
             ActiveNode = node;
             var cfg = ChapterDatabase.GetNode(node);
             State = FlowState.Battle;
+            ApplyPreJoins(cfg);
+            if (cfg.HasChoice)
+            {
+                var c = cfg.Choice;
+                dlg.PlayChoice(c.Prompt, c.AText, c.BText, pick => { ApplyChoice(cfg, pick); BeginPre(cfg); });
+            }
+            else BeginPre(cfg);
+        }
+
+        void BeginPre(ChapterConfig cfg)
+        {
             dlg.Play(cfg.Pre, () =>
             {
                 gm.StartBattle(cfg);
                 if (cfg.Tutorial && tutor != null) tutor.Begin();
             });
+        }
+
+        void ApplyPreJoins(ChapterConfig cfg)
+        {
+            var save = SaveSystem.Current;
+            if (save == null || cfg.PreJoins == null) return;
+            foreach (var id in cfg.PreJoins)
+                if (!save.roster.Exists(r => r.rosterId == id))
+                    save.roster.Add(JoinTemplate(id));
+        }
+
+        void ApplyChoice(ChapterConfig cfg, bool pickA)
+        {
+            var save = SaveSystem.Current;
+            var c = cfg.Choice;
+            string join = pickA ? c.AJoin : c.BJoin;
+            if (!string.IsNullOrEmpty(join) && save != null && !save.roster.Exists(r => r.rosterId == join))
+                save.roster.Add(JoinTemplate(join));
+            if (save != null)
+            {
+                if (pickA) { Reputation.Add(save, c.AFaction, c.APts); Inventory.Gold += c.AGold; }
+                else { Reputation.Add(save, c.BFaction, c.BPts); Inventory.Gold += c.BGold; }
+            }
+            EventBus.Log(pickA ? $"Chose: {c.AText}" : $"Chose: {c.BText}");
         }
 
         void OnBattleState(GameState s)
@@ -112,6 +147,7 @@ namespace Garganta.Flow
             if (save == null) return;
             foreach (var u in gm.PlayerUnits)
             {
+                if (!u.IsAlive) continue; // permadeath handled in battle report
                 var cap = u.Capture();
                 int i = save.roster.FindIndex(r => r.rosterId == cap.rosterId);
                 if (i >= 0) save.roster[i] = cap;
@@ -135,6 +171,10 @@ namespace Garganta.Flow
                 case "Briar": return U("Briar", "Squire", 1, "hand_axe", "", "", "");
                 case "Sera": return U("Sera", "Acolyte", 1, "wooden_staff", "", "", "");
                 case "Voss": return U("Voss", "Archer", 2, "short_bow", "", "", "");
+                case "Dawn": return U("Dawn", "Squire", 4, "iron_sword", "", "", "");
+                case "Lyra": return U("Lyra", "Mage", 3, "grimoire", "", "", "");
+                case "Renn": return U("Renn", "Thief", 3, "", "", "", "");
+                case "Zara": return U("Zara", "Squire", 5, "iron_sword", "", "", "");
                 default: return U(id, "Squire", 1, "rusty_sword", "", "", "");
             }
         }
@@ -145,6 +185,9 @@ namespace Garganta.Flow
                 rosterId = id, classId = cls, level = lv, xp = 0,
                 weaponId = w, armorId = a, helmetId = h, accId = acc,
                 mastery = new List<MasteryEntry>(),
+                jobs = new List<JobEntry> { new JobEntry { classId = cls, level = 1 } },
+                known = new List<string> { cls },
+                corruption = 0,
             };
     }
 }

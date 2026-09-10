@@ -16,6 +16,7 @@ namespace Garganta.Combat
         bool running;
         bool playerBusy;
         float timer;
+        Grid.GridManager gridCache;
 
         public static float ComputeGain(float speed, float mod) => speed * (1f + mod);
 
@@ -57,6 +58,34 @@ namespace Garganta.Combat
 
             Unit u2 = All[idx];
             EventBus.TurnAdvanced();
+            if (gridCache == null) gridCache = FindAnyObjectByType<Grid.GridManager>();
+            if (gridCache != null && u2.IsAlive)
+            {
+                var tile = gridCache.Tiles[u2.Coord.x, u2.Coord.y];
+                if (tile.Type == Core.TileType.Blight)
+                {
+                    int before = CombatManager.CorruptionTier(u2.Corruption);
+                    u2.Corruption = Mathf.Min(100, u2.Corruption + 10);
+                    if (CombatManager.CorruptionTier(u2.Corruption) > before)
+                        EventBus.Log($"{u2.UnitName}'s corruption deepens! ({u2.Corruption}%)");
+                }
+            }
+            if (u2.Corruption >= 100)
+            {
+                u2.TakeDamage(99999);
+                EventBus.Log($"{u2.UnitName} is consumed by the Blight!");
+                u2.ResetCTB();
+                u2.TickEndStatus();
+                GameManager.Instance.CheckEnd();
+                return;
+            }
+            if (CombatManager.LoseTurnRoll(u2.Corruption, Random.value))
+            {
+                EventBus.Log($"{u2.UnitName} loses control!");
+                u2.ResetCTB();
+                u2.TickEndStatus();
+                return;
+            }
             if (u2.StunTurns > 0)
             {
                 u2.StunTurns--;

@@ -17,6 +17,7 @@ namespace Garganta.UI
             GUILayout.BeginVertical("box");
             GUILayout.Label("WORLD MAP — Act I");
             GUILayout.Label($"Gold: {Inventory.Gold}G   Party: {save.roster.Count}");
+            GUILayout.Label(Reputation.Summary(save));
             GUILayout.Space(8);
             for (int i = 0; i < ChapterDatabase.NodeCount; i++)
             {

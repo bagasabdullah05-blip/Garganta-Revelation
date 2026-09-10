@@ -7,6 +7,9 @@ namespace Garganta.Data
     public struct MasteryEntry { public string classId; public int pct; }
 
     [Serializable]
+    public struct JobEntry { public string classId; public int level; }
+
+    [Serializable]
     public struct UnitSave
     {
         public string rosterId;
@@ -18,6 +21,9 @@ namespace Garganta.Data
         public string helmetId;
         public string accId;
         public List<MasteryEntry> mastery;
+        public List<JobEntry> jobs;
+        public List<string> known;
+        public int corruption;
     }
 
     [Serializable]
@@ -26,11 +32,13 @@ namespace Garganta.Data
     [Serializable]
     public class GameSave
     {
-        public int version = 3;
+        public int version = 4;
         public int progress; // highest unlocked node index
         public List<UnitSave> roster = new List<UnitSave>();
         public int gold;
         public List<StockEntry> stock = new List<StockEntry>();
         public List<string> ownedEquip = new List<string>();
+        public List<Reputation.RepEntry> rep = new List<Reputation.RepEntry>();
+        public List<Bonds.BondEntry> bonds = new List<Bonds.BondEntry>();
     }
 }
