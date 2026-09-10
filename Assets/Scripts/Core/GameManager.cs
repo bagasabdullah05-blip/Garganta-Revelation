@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Garganta.AI;
+using Garganta.Combat;
+using Garganta.Data;
 using Garganta.Grid;
 using Garganta.Units;
-using Garganta.Combat;
-using Garganta.AI;
 
 namespace Garganta.Core
 {
-    // Singleton + State Machine. Owns battle setup and player input (click to move/attack).
+    // Singleton + State Machine. Owns battle setup and player input (move/attack/skill/item).
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
@@ -18,6 +19,9 @@ namespace Garganta.Core
         public Unit SelectedUnit;
         public Unit CurrentUnit; // whose turn is active (player)
         public bool TargetingAttack;
+        public Skill? PendingSkill;
+        public string PendingItem;
+        public string BattleReport = "";
 
         GridManager grid;
         GridVisualizer visual;
@@ -66,7 +70,7 @@ namespace Garganta.Core
             for (int i = 0; i < players.Length; i++)
                 PlayerUnits.Add(UnitFactory.Create(players[i], true, pPos[i], grid));
 
-            string[] enemies = { "Bandit", "Bandit", "Goblin", "Goblin", "Wolf", "Skeleton" };
+            string[] enemies = { "Bandit", "Cultist", "Goblin", "Goblin", "Wolf", "Skeleton" };
             Vector2Int[] ePos = { new Vector2Int(9, 9), new Vector2Int(10, 9), new Vector2Int(9, 10), new Vector2Int(10, 10), new Vector2Int(8, 9), new Vector2Int(9, 8) };
             for (int i = 0; i < enemies.Length; i++)
                 EnemyUnits.Add(UnitFactory.Create(enemies[i], false, ePos[i], grid));
@@ -76,13 +80,16 @@ namespace Garganta.Core
         {
             if (State != GameState.PlayerTurn || CurrentUnit == null) return;
             if (Input.GetMouseButtonDown(0)) HandleClick();
-            if (Input.GetMouseButtonDown(1)) { TargetingAttack = false; visual.ClearHighlights(); }
+            if (Input.GetMouseButtonDown(1)) CancelTargeting();
         }
 
         void HandleClick()
         {
             Vector3 mw = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector2Int cell = grid.WorldToCoord(mw);
+
+            if (PendingSkill.HasValue) { ResolveSkillTarget(cell); return; }
+            if (PendingItem != null) { ResolveItemTarget(cell); return; }
 
             if (TargetingAttack)
             {
@@ -92,7 +99,7 @@ namespace Garganta.Core
                     combat.Attack(CurrentUnit, foe);
                     EndPlayerAction();
                 }
-                else { TargetingAttack = false; visual.ClearHighlights(); ShowMoveRange(); }
+                else { CancelTargeting(); ShowMoveRange(); }
                 return;
             }
 
@@ -117,6 +124,48 @@ namespace Garganta.Core
             }
         }
 
+        void ResolveSkillTarget(Vector2Int cell)
+        {
+            var sk = PendingSkill.Value;
+            if (sk.SelfOnly)
+            {
+                combat.ResolveSkill(CurrentUnit, sk, CurrentUnit, PlayerUnits, EnemyUnits);
+                CancelTargeting();
+                EndPlayerAction();
+                return;
+            }
+            int range = sk.Range > 0 ? sk.Range : CurrentUnit.Stats.Range;
+            var pool = sk.TargetsAllies ? PlayerUnits : EnemyUnits;
+            Unit t = UnitAt(cell, pool);
+            if (t != null && HexDist(CurrentUnit.Coord, cell) <= range)
+            {
+                combat.ResolveSkill(CurrentUnit, sk, t, PlayerUnits, EnemyUnits);
+                CancelTargeting();
+                EndPlayerAction();
+            }
+            else { CancelTargeting(); ShowMoveRange(); }
+        }
+
+        void ResolveItemTarget(Vector2Int cell)
+        {
+            var item = EquipmentData.FindConsumable(PendingItem);
+            if (item.BombAll || item.Revive)
+            {
+                combat.UseItem(CurrentUnit, item, null, PlayerUnits, EnemyUnits);
+                CancelTargeting();
+                EndPlayerAction();
+                return;
+            }
+            Unit t = UnitAt(cell, PlayerUnits);
+            if (t != null)
+            {
+                combat.UseItem(CurrentUnit, item, t, PlayerUnits, EnemyUnits);
+                CancelTargeting();
+                EndPlayerAction();
+            }
+            else { CancelTargeting(); ShowMoveRange(); }
+        }
+
         void ShowMoveRange()
         {
             moveRange = AITactics.ReachableTiles(grid, SelectedUnit.Coord, SelectedUnit.Stats.Move);
@@ -125,35 +174,97 @@ namespace Garganta.Core
 
         public void ShowAttackRange()
         {
+            CancelTargeting();
             TargetingAttack = true;
-            visual.ClearHighlights();
             var cells = AITactics.TilesInRange(grid, CurrentUnit.Coord, CurrentUnit.Stats.Range);
             visual.ShowRange(cells, new Color(1f, 0.35f, 0.3f, 0.45f));
+        }
+
+        public void SelectSkill(Skill sk)
+        {
+            CancelTargeting();
+            PendingSkill = sk;
+            int range = sk.Range > 0 ? sk.Range : CurrentUnit.Stats.Range;
+            var cells = AITactics.TilesInRange(grid, CurrentUnit.Coord, range);
+            visual.ShowRange(cells, new Color(1f, 0.85f, 0.3f, 0.45f));
+        }
+
+        public void SelectItem(string id)
+        {
+            var item = EquipmentData.FindConsumable(id);
+            if (Inventory.Count(id) <= 0) return;
+            if (item.BombAll || item.Revive)
+            {
+                combat.UseItem(CurrentUnit, item, null, PlayerUnits, EnemyUnits);
+                EndPlayerAction();
+                return;
+            }
+            CancelTargeting();
+            PendingItem = id;
+        }
+
+        public void CancelTargeting()
+        {
+            TargetingAttack = false;
+            PendingSkill = null;
+            PendingItem = null;
+            visual.ClearHighlights();
         }
 
         public void PlayerWait() => EndPlayerAction();
 
         void EndPlayerAction()
         {
-            TargetingAttack = false;
+            CancelTargeting();
             SelectedUnit = null;
-            visual.ClearHighlights();
-            CurrentUnit.ResetCTB();
-            CurrentUnit = null;
+            if (CurrentUnit != null)
+            {
+                CurrentUnit.TickEndStatus();
+                CurrentUnit.ResetCTB();
+                CurrentUnit = null;
+            }
             turns.NotifyPlayerDone();
             CheckEnd();
         }
 
         public void OnEnemyDone(Unit u)
         {
+            u.TickEndStatus();
             u.ResetCTB();
             CheckEnd();
         }
 
         public void CheckEnd()
         {
-            if (!AnyAlive(EnemyUnits)) SetState(GameState.Victory);
+            if (State == GameState.Victory || State == GameState.Defeat) return;
+            if (!AnyAlive(EnemyUnits)) { AwardVictory(); SetState(GameState.Victory); }
             else if (!AnyAlive(PlayerUnits)) SetState(GameState.Defeat);
+        }
+
+        void AwardVictory()
+        {
+            var alive = PlayerUnits.FindAll(p => p.IsAlive);
+            int xpEach = 0;
+            foreach (var e in EnemyUnits) xpEach += 50 + e.Level * 25;
+            if (alive.Count > 0) xpEach /= alive.Count;
+            var lines = new List<string> { $"Victory! +{xpEach} XP each" };
+            foreach (var p in alive)
+            {
+                bool up = p.GainXP(xpEach);
+                p.AddMastery(p.ClassId, 5);
+                if (up) lines.Add($"{p.UnitName} reached Lv {p.Level}!");
+            }
+            int gold = 0;
+            foreach (var e in EnemyUnits) gold += Random.Range(10, 31);
+            Inventory.Gold += gold;
+            lines.Add($"+{gold}G (purse {Inventory.Gold}G)");
+            foreach (var e in EnemyUnits)
+            {
+                float r = Random.value;
+                if (r < 0.3f) { Inventory.Add("potion"); lines.Add("Loot: Potion"); }
+                else if (r < 0.4f) { Inventory.Add("ether"); lines.Add("Loot: Ether"); }
+            }
+            BattleReport = string.Join("\n", lines);
         }
 
         public static bool AnyAlive(List<Unit> list)

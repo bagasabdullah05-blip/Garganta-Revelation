@@ -73,5 +73,52 @@ namespace Garganta.AI
         public static bool ShouldRetreat(Unit self)
             => self.Behavior != AIBehavior.Aggressive && self.Behavior != AIBehavior.Boss
                && self.HP < self.Stats.MaxHP * 0.25f;
+
+        public static Unit FindWoundedAlly(List<Unit> allies)
+        {
+            Unit best = null;
+            float bestFrac = 1f;
+            foreach (var a in allies)
+            {
+                if (!a.IsAlive) continue;
+                float frac = (float)a.HP / a.Stats.MaxHP;
+                if (frac < bestFrac) { bestFrac = frac; best = a; }
+            }
+            return bestFrac < 1f ? best : null;
+        }
+
+        // Reachable tile closest to a point of interest (ally to heal / foe to chase).
+        public static Vector2Int TileToward(Unit self, Vector2Int goal, HashSet<Vector2Int> reachable, GridManager grid)
+        {
+            Vector2Int best = self.Coord;
+            int bestD = GridManager.HexDistance(self.Coord, goal);
+            foreach (var t in reachable)
+            {
+                var occ = grid.Tiles[t.x, t.y].Occupant;
+                if (occ != null && occ != self) continue;
+                int d = GridManager.HexDistance(t, goal);
+                if (d < bestD) { bestD = d; best = t; }
+            }
+            return best;
+        }
+
+        public static Vector2Int FleeTile(Unit self, HashSet<Vector2Int> reachable, GridManager grid, List<Unit> foes)
+        {
+            Vector2Int best = self.Coord;
+            int bestD = int.MinValue;
+            foreach (var t in reachable)
+            {
+                var occ = grid.Tiles[t.x, t.y].Occupant;
+                if (occ != null && occ != self) continue;
+                int minD = int.MaxValue;
+                foreach (var f in foes)
+                {
+                    if (!f.IsAlive) continue;
+                    minD = Mathf.Min(minD, GridManager.HexDistance(t, f.Coord));
+                }
+                if (minD > bestD) { bestD = minD; best = t; }
+            }
+            return best;
+        }
     }
 }

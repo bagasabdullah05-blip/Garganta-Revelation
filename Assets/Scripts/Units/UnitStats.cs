@@ -15,6 +15,7 @@ namespace Garganta.Units
         public int Range = 1;
         public int Acc = 90;
         public int Eva = 10;
+        public int MaxMP = 20;
         public WeaponType Weapon = WeaponType.Sword;
         public float WeaponMult = 1f;
         public float ClassMult = 1f;

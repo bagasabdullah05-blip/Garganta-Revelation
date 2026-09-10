@@ -1,6 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Garganta.AI;
 using Garganta.Core;
+using Garganta.Data;
 
 namespace Garganta.Units
 {
@@ -9,10 +11,20 @@ namespace Garganta.Units
         public string UnitName = "Unit";
         public bool IsPlayer;
         public AIBehavior Behavior = AIBehavior.Aggressive;
-        public UnitStats Stats = new UnitStats();
+        public string ClassId = "Squire";
+        public int Level = 1;
+        public int XP = 0;
+        public int MP;
+        public UnitStats CoreStats = new UnitStats(); // base + growth (no equipment)
+        public UnitStats Stats = new UnitStats();     // effective in battle
+        public Dictionary<EquipSlot, Equipment> Equipped = new Dictionary<EquipSlot, Equipment>();
+        public Dictionary<string, int> Mastery = new Dictionary<string, int>();
         public Vector2Int Coord;
         public float CTB;
         public int HP;
+        // Temporary battle buffs (shared duration for M2)
+        public int BuffAtk, BuffDef, BuffEva, BuffMag, BuffTurns;
+        public int StunTurns;
         public bool IsAlive => HP > 0;
 
         public void Init(string id, string display, bool player, UnitStats s, Vector2Int c)
@@ -20,10 +32,82 @@ namespace Garganta.Units
             name = id;
             UnitName = display;
             IsPlayer = player;
-            Stats = s;
+            CoreStats = s.Clone();
             Coord = c;
             HP = s.MaxHP;
+            MP = 0;
             CTB = 0f;
+            RefreshStats();
+        }
+
+        public void SetClass(string classId)
+        {
+            ClassId = classId;
+            MaxMPFromMag();
+            MP = Stats.MaxMP;
+        }
+
+        void MaxMPFromMag() => CoreStats.MaxMP = 20 + CoreStats.MAG * 2;
+
+        public void RefreshStats()
+        {
+            Stats = CoreStats.Clone();
+            foreach (var kv in Equipped)
+            {
+                var e = kv.Value;
+                Stats.ATK += e.ATK;
+                Stats.DEF += e.DEF;
+                Stats.MAG += e.MAG;
+                Stats.MDEF += e.MDEF;
+                Stats.SPD += e.SPD;
+                Stats.Move += e.Move;
+                Stats.Range += e.Range;
+                Stats.Acc += e.Acc;
+                Stats.Eva += e.Eva;
+                if (kv.Key == EquipSlot.Weapon && e.Weapon != WeaponType.None) Stats.Weapon = e.Weapon;
+            }
+            Stats.Move = Mathf.Max(1, Stats.Move);
+            Stats.Range = Mathf.Max(1, Stats.Range);
+            HP = Mathf.Min(HP == 0 ? Stats.MaxHP : HP, Stats.MaxHP);
+            MP = Mathf.Min(MP, Stats.MaxMP);
+        }
+
+        public static int XpNeed(int level) => Mathf.FloorToInt(100f * Mathf.Pow(level, 1.5f));
+
+        // Returns true if at least one level gained.
+        public bool GainXP(int amount)
+        {
+            if (!IsAlive || Level >= 50) return false;
+            XP += amount;
+            bool leveled = false;
+            var rec = ClassDatabase.Get(ClassId);
+            while (Level < 50 && XP >= XpNeed(Level))
+            {
+                XP -= XpNeed(Level);
+                Level++;
+                leveled = true;
+                CoreStats.MaxHP += rec.GHP;
+                CoreStats.ATK += rec.GATK;
+                CoreStats.DEF += rec.GDEF;
+                CoreStats.MAG += rec.GMAG;
+                CoreStats.MDEF += rec.GMDEF;
+                CoreStats.SPD += rec.GSPD;
+                HP += rec.GHP;
+                MaxMPFromMag();
+                MP = Stats.MaxMP;
+            }
+            if (leveled) RefreshStats();
+            return leveled;
+        }
+
+        public int MasteryOf(string classId) => Mastery.TryGetValue(classId, out int v) ? v : 0;
+        public void AddMastery(string classId, int amt) => Mastery[classId] = Mathf.Min(100, MasteryOf(classId) + amt);
+
+        public bool UseMP(int cost)
+        {
+            if (MP < cost) return false;
+            MP -= cost;
+            return true;
         }
 
         public void GainCTB(float amount)
@@ -44,5 +128,10 @@ namespace Garganta.Units
         }
 
         public void Heal(int amount) => HP = Mathf.Min(Stats.MaxHP, HP + amount);
+
+        public void TickEndStatus()
+        {
+            if (BuffTurns > 0 && --BuffTurns <= 0) { BuffAtk = BuffDef = BuffEva = BuffMag = 0; }
+        }
     }
 }

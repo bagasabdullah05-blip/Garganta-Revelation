@@ -57,6 +57,14 @@ namespace Garganta.Combat
 
             Unit u2 = All[idx];
             EventBus.TurnAdvanced();
+            if (u2.StunTurns > 0)
+            {
+                u2.StunTurns--;
+                EventBus.Log($"{u2.UnitName} is stunned!");
+                u2.ResetCTB();
+                u2.TickEndStatus();
+                return;
+            }
             if (u2.IsPlayer)
             {
                 GameManager.Instance.SelectedUnit = u2;
