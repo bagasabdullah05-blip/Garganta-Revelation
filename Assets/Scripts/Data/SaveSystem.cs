@@ -70,6 +70,8 @@ namespace Garganta.Data
             Inventory.Gold = Current.gold;
             Inventory.Clear();
             foreach (var s in Current.stock) Inventory.Add(s.id, s.count);
+            Inventory.ClearMats();
+            if (Current.mats != null) foreach (var s in Current.mats) Inventory.AddMat(s.id, s.count);
         }
 
         // Pull runtime -> save (call before Save()).
@@ -80,6 +82,9 @@ namespace Garganta.Data
             Current.stock.Clear();
             foreach (var kv in Inventory.Stock())
                 Current.stock.Add(new StockEntry { id = kv.Key, count = kv.Value });
+            Current.mats.Clear();
+            foreach (var kv in Inventory.Mats())
+                Current.mats.Add(new StockEntry { id = kv.Key, count = kv.Value });
         }
     }
 }

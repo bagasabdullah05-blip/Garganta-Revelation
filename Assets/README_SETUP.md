@@ -12,10 +12,9 @@ asset + HD-2D art final menyusul di M5.
 3. Jika diminta Safe Mode / API update → Continue.
 
 ## Buat scene TestBattle
-1. File → New Scene (Basic Empty).
-2. Menu **Garganta → Setup TestBattle Scene** (menambah Battle + UI + Flow).
-3. File → Save As → `Assets/Scenes/TestBattle.unity`.
-4. Press Play.
+Scene resmi sudah di repo (`Assets/Scenes/TestBattle.unity`) — langsung buka + Play.
+Regenerasi bila perlu: New Scene → menu **Garganta → Setup TestBattle Scene**
+(menambah Battle + UI + Flow) → Save As ke path yang sama.
 
 ## Alur main (M3)
 - **Title**: New Game / Continue / Load slot 1-3.
@@ -24,7 +23,10 @@ asset + HD-2D art final menyusul di M5.
 - **Battle**: sama seperti M2 + hint tutorial di Ch.1. Menang → XP/loot + dialogue
   penutup + rekrut baru + auto-save → kembali ke Map. Kalah → ulang tanpa penalti.
 - **Bastion (Base)**: Party (lihat stats), Equip (ganti gear milik), Shop
-  (beli potion/gear pakai gold), Save (slot 1-3).
+  (beli potion/gear/material), Workshop (craft 8 resep: Steel Sword, Flametongue,
+  Partisan, Dragon Mail, Materia Staff, Hunter Bow, Blight Edge, Elixir),
+  Save (slot 1-3). Material (iron ore, herbs, leather-hide, crystal, essence, scale,
+  ichor) drop dari musuh sesuai class-nya.
 
 ## Kontrol Play (M2)
 - Klik unit biru (punyamu, yang giliran `*` di bar atas) → highlight biru = move range.
@@ -76,9 +78,9 @@ asset + HD-2D art final menyusul di M5.
 
 ## Tests
 Window → General → Test Runner → EditMode → Run All.
-Harus hijau 82: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
+Harus hijau 93: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
 Skill(6), Equipment(6), Save(3), Chapter(5), Shop(5), Job(5), Bond(4),
 Corruption(3), Recruit(2), Rep(1), Tier3(4), Ending(5), Skirmish(3), Wave(3),
-ArtAudio(5) + 1 stub Addressables.
+ArtAudio(5), Difficulty(5), AudioAssets(2), Crafting(4) + 1 stub Addressables.
 Bisa juga headless:
 `Unity.exe -batchmode -quit -projectPath "K:\unity\Garganta-Revelation" -runTests -testPlatform EditMode -testResults results.xml`

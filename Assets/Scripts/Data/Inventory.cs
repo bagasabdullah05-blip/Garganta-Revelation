@@ -26,6 +26,19 @@ namespace Garganta.Data
 
         public static IEnumerable<KeyValuePair<string, int>> Stock() => stock;
 
+        // Crafting materials (Bastion Workshop, M6+).
+        static readonly Dictionary<string, int> mats = new Dictionary<string, int>();
+        public static int MatCount(string id) => mats.TryGetValue(id, out int v) ? v : 0;
+        public static void AddMat(string id, int n = 1) => mats[id] = MatCount(id) + n;
+        public static bool TakeMat(string id, int n = 1)
+        {
+            if (MatCount(id) < n) return false;
+            mats[id] = MatCount(id) - n;
+            return true;
+        }
+        public static void ClearMats() => mats.Clear();
+        public static IEnumerable<KeyValuePair<string, int>> Mats() => mats;
+
         // Owned (unequipped) gear by equipment id. Mirrors GameSave.ownedEquip at runtime.
         public static readonly List<string> OwnedEquip = new List<string>();
         public static void AddOwned(string id) => OwnedEquip.Add(id);

@@ -401,7 +401,32 @@ namespace Garganta.Core
                 if (r < 0.3f) { Inventory.Add("potion"); lines.Add("Loot: Potion"); }
                 else if (r < 0.4f) { Inventory.Add("ether"); lines.Add("Loot: Ether"); }
             }
+            foreach (var e in EnemyUnits)
+            {
+                if (Random.value < 0.4f)
+                {
+                    string mat = MatForClass(e.ClassId);
+                    Inventory.AddMat(mat);
+                    lines.Add($"Loot: {Crafting.MatName(mat)}");
+                }
+            }
             BattleReport = string.Join("\n", lines);
+        }
+
+        static string MatForClass(string cls)
+        {
+            switch (cls)
+            {
+                case "Mage":
+                case "Acolyte":
+                case "WhiteMage":
+                case "BlackMage": return "magic_essence";
+                case "Archer": return "leather_hide";
+                case "Assassin":
+                case "Shadowblade": return "blight_ichor";
+                case "Thief": return "herbs";
+                default: return "iron_ore";
+            }
         }
 
         public static bool AnyAlive(List<Unit> list)

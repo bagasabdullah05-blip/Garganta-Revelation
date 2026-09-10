@@ -35,6 +35,7 @@ namespace Garganta.UI
             if (GUILayout.Button("Shop")) tab = 2;
             if (GUILayout.Button("Save")) tab = 3;
             if (GUILayout.Button("Jobs")) tab = 4;
+            if (GUILayout.Button("Workshop")) tab = 5;
             GUILayout.EndHorizontal();
 
             switch (tab)
@@ -44,6 +45,7 @@ namespace Garganta.UI
                 case 2: ShopTab(save); break;
                 case 3: SaveTab(flow); break;
                 case 4: JobsTab(save); break;
+                case 5: WorkshopTab(save); break;
             }
             if (GUILayout.Button("Back to Map", GUILayout.Height(32))) flow.ToMap();
             GUILayout.EndVertical();
@@ -114,6 +116,16 @@ namespace Garganta.UI
                 GUI.enabled = Inventory.Gold >= c.Price;
                 if (GUILayout.Button($"{c.Name} ({c.Price}G) — {c.Desc} [x{Inventory.Count(id)}]"))
                     Inventory.TryBuyConsumable(id);
+            }
+            GUI.enabled = true;
+            GUILayout.Label("Materials:");
+            foreach (var kv in Crafting.MatPrices)
+            {
+                GUI.enabled = Inventory.Gold >= kv.Value;
+                if (GUILayout.Button($"{Crafting.MatName(kv.Key)} ({kv.Value}G) [x{Inventory.MatCount(kv.Key)}]"))
+                {
+                    if (Inventory.Gold >= kv.Value) { Inventory.Gold -= kv.Value; Inventory.AddMat(kv.Key); }
+                }
             }
             GUI.enabled = true;
             GUILayout.Label("Gear:");
@@ -204,6 +216,25 @@ namespace Garganta.UI
             if (r.jobs == null) return 0;
             int k = r.jobs.FindIndex(j => j.classId == cls);
             return k >= 0 ? r.jobs[k].level : 0;
+        }
+
+        void WorkshopTab(GameSave save)
+        {
+            GUILayout.Label("Craft gear (consumes base item + materials):");
+            foreach (var r in Crafting.Recipes)
+            {
+                string result = !string.IsNullOrEmpty(r.ResultEquip)
+                    ? EquipmentData.FindAny(r.ResultEquip).Name
+                    : EquipmentData.FindConsumable(r.ResultConsum).Name;
+                string cost = "";
+                if (!string.IsNullOrEmpty(r.NeedEquip)) cost += EquipmentData.FindAny(r.NeedEquip).Name + " + ";
+                foreach (var m in r.NeedMats) cost += $"{Crafting.MatName(m.id)}x{m.count}({Inventory.MatCount(m.id)}) ";
+                foreach (var c in r.NeedCons) cost += $"{EquipmentData.FindConsumable(c.id).Name}x{c.count}({Inventory.Count(c.id)}) ";
+                GUI.enabled = Crafting.CanCraft(r, Inventory.OwnedEquip);
+                if (GUILayout.Button($"{r.Name}: {cost}=> {result}"))
+                    Crafting.Craft(r, Inventory.OwnedEquip, save.ownedEquip);
+            }
+            GUI.enabled = true;
         }
 
         static string GearName(string id) => string.IsNullOrEmpty(id) ? "-" : (EquipmentData.FindAny(id).Name ?? "-");

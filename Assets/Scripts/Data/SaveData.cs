@@ -37,6 +37,7 @@ namespace Garganta.Data
         public List<UnitSave> roster = new List<UnitSave>();
         public int gold;
         public List<StockEntry> stock = new List<StockEntry>();
+        public List<StockEntry> mats = new List<StockEntry>();
         public List<string> ownedEquip = new List<string>();
         public List<Reputation.RepEntry> rep = new List<Reputation.RepEntry>();
         public List<Bonds.BondEntry> bonds = new List<Bonds.BondEntry>();
