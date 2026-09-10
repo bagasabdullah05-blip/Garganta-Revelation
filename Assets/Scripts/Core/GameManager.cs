@@ -56,6 +56,8 @@ namespace Garganta.Core
 
         void SetupBattle()
         {
+            Garganta.Art.ArtOverride.LoadAll();
+            Music("battle");
             grid.Generate();
             visual.Build(grid);
             SpawnSides();
@@ -85,6 +87,8 @@ namespace Garganta.Core
             ClearBattle();
             ActiveCfg = cfg;
             WavePending = cfg.Wave2Ids != null && cfg.Wave2Ids.Length > 0;
+            Garganta.Art.ArtOverride.LoadAll();
+            Music(cfg.Id == "ch9" || cfg.Id == "ch11" || cfg.Id == "primeval" ? "boss" : "battle");
             grid.GenerateVariant(cfg.MapVariant);
             visual.Build(grid);
             SpawnRoster(cfg);
@@ -327,9 +331,10 @@ namespace Garganta.Core
             if (!AnyAlive(EnemyUnits))
             {
                 if (WavePending) { WavePending = false; SpawnWave(); return; }
+                Music("victory");
                 AwardVictory(); SetState(GameState.Victory);
             }
-            else if (!AnyAlive(PlayerUnits)) SetState(GameState.Defeat);
+            else if (!AnyAlive(PlayerUnits)) { Music("defeat"); SetState(GameState.Defeat); }
         }
 
         void ApplySupportBonds()
@@ -407,5 +412,11 @@ namespace Garganta.Core
         }
 
         public static int HexDist(Vector2Int a, Vector2Int b) => GridManager.HexDistance(a, b);
+
+        void Music(string id)
+        {
+            var am = FindAnyObjectByType<Garganta.Audio.AudioManager>();
+            if (am != null) am.PlayMusic(id);
+        }
     }
 }

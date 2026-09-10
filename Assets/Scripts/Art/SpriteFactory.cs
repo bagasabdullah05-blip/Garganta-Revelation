@@ -34,6 +34,8 @@ namespace Garganta.Art
 
         static Sprite Make(string key, Texture2D t, float ppu)
         {
+            var ov = ArtOverride.Get(key);
+            if (ov != null) { Object.Destroy(t); return ov; }
             t.Apply();
             var s = Sprite.Create(t, new Rect(0, 0, t.width, t.height), new Vector2(0.5f, 0.5f), ppu);
             cache[key] = s;

@@ -15,6 +15,7 @@ namespace Garganta.Flow
         public static GameFlow Instance { get; private set; }
         public FlowState State = FlowState.Title;
         public int ActiveNode = -1;
+        string curMusic;
 
         GameManager gm;
         DialogueUI dlg;
@@ -36,6 +37,20 @@ namespace Garganta.Flow
         }
 
         void OnDestroy() => EventBus.OnGameStateChanged -= OnBattleState;
+
+        void Update()
+        {
+            string want = State == FlowState.Title ? "title"
+                : State == FlowState.Map ? "map"
+                : State == FlowState.Base ? "base"
+                : State == FlowState.Ending ? "ending" : null;
+            if (want != null && want != curMusic)
+            {
+                curMusic = want;
+                var am = FindAnyObjectByType<Garganta.Audio.AudioManager>();
+                if (am != null) am.PlayMusic(want);
+            }
+        }
 
         public void NewGame()
         {

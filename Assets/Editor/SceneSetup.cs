@@ -31,7 +31,7 @@ namespace Garganta.Editor
             if (cam.GetComponent<CameraShake>() == null) cam.gameObject.AddComponent<CameraShake>();
 
             Ensure("Battle", typeof(GameManager), typeof(GridManager), typeof(GridVisualizer),
-                typeof(TurnManager), typeof(CombatManager), typeof(ObjectPool));
+                typeof(TurnManager), typeof(CombatManager), typeof(ObjectPool), typeof(Audio.AudioManager));
             Ensure("UI", typeof(UIManager), typeof(TurnOrderUI), typeof(UnitInfoUI),
                 typeof(ActionMenuUI), typeof(CombatUI), typeof(GameOverUI));
             Ensure("Flow", typeof(GameFlow), typeof(TitleUI), typeof(WorldMapUI),

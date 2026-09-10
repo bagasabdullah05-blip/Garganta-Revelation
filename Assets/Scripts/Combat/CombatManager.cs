@@ -106,6 +106,7 @@ namespace Garganta.Combat
             if (!alwaysHit && Random.Range(0f, 100f) > hit)
             {
                 Popup(defender.transform.position, "MISS", Color.gray);
+                Sfx("miss");
                 EventBus.Log($"{attacker.UnitName} missed {defender.UnitName}");
                 return 0;
             }
@@ -118,6 +119,7 @@ namespace Garganta.Combat
             EventBus.Log($"{attacker.UnitName} hit {defender.UnitName} for {dmg}{(crit ? " CRIT" : "")}");
 
             Popup(defender.transform.position, dmg.ToString(), crit ? Color.red : Color.white);
+            Sfx(magical ? "skill_magic" : "hit");
             var shake = FindAnyObjectByType<CameraShake>();
             if (shake != null) shake.AddShake(crit ? 0.5f : 0.2f);
             return dmg;
@@ -173,6 +175,7 @@ namespace Garganta.Combat
                             t.Corruption = Mathf.Max(0, t.Corruption - 25);
                         }
                         Popup(t.transform.position, "+" + amt, Color.green);
+                        Sfx("heal");
                         EventBus.Log($"{caster.UnitName} heals {t.UnitName} for {amt}");
                         break;
                     case SkillEffect.Recruit:
@@ -254,6 +257,12 @@ namespace Garganta.Combat
         {
             var cui = FindAnyObjectByType<CombatUI>();
             if (cui != null) cui.SpawnText(pos, text, color);
+        }
+
+        void Sfx(string id)
+        {
+            var am = FindAnyObjectByType<Garganta.Audio.AudioManager>();
+            if (am != null) am.PlaySfx(id);
         }
     }
 }

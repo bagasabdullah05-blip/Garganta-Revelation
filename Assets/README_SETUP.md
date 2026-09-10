@@ -1,4 +1,4 @@
-# Setup & Play — Garganta Revelation M5 (Unity 6000.6.0f1, 2D URP-ready)
+# Setup & Play — Garganta Revelation M6 (Unity 6000.6.0f1, 2D URP-ready)
 
 Packages (Unity 6): `feature.2d 2.0.1`, `2d.tilemap.extras 4.0.2`,
 `render-pipelines.universal 17.2.1`, `inputsystem 1.20.0`, `cinemachine 3.1.2`,
@@ -64,11 +64,21 @@ asset + HD-2D art final menyusul di M5.
   (superboss post-ending), **NG+** (roster kept, musuh +2).
 - Roster final 15/15 sesuai PRD.
 
+## Produksi M6 (art & audio final — tanpa ubah code)
+- Musik: 18 prompt siap-copy di `docs/AUDIO_BRIEF.md` (Suno/Udio) → taruh ogg di
+  `Assets/Resources/Audio/Music/<id>.ogg` → otomatis bunyi (title/map/base/
+  battle/boss/victory/defeat/ending).
+- SFX: daftar + keyword Freesound + resep Bfxr di `docs/AUDIO_BRIEF.md` → taruh wav
+  di `Assets/Resources/Audio/SFX/<id>.wav` (`hit skill_magic miss heal` sudah bunyi).
+- Pixel art: palet `docs/PALETTE.gpl` + checklist + nama file exact di
+  `docs/ART_TASKS.md` → taruh PNG di `Assets/Resources/Art/` → otomatis ganti
+  placeholder. Prompt karakter sudah ada di `docs/ART_BRIEF.md`.
+
 ## Tests
 Window → General → Test Runner → EditMode → Run All.
-Harus hijau 77: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
+Harus hijau 82: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
 Skill(6), Equipment(6), Save(3), Chapter(5), Shop(5), Job(5), Bond(4),
-Corruption(3), Recruit(2), Rep(1), Tier3(4), Ending(5), Skirmish(3), Wave(3)
-+ 1 stub Addressables.
+Corruption(3), Recruit(2), Rep(1), Tier3(4), Ending(5), Skirmish(3), Wave(3),
+ArtAudio(5) + 1 stub Addressables.
 Bisa juga headless:
 `Unity.exe -batchmode -quit -projectPath "K:\unity\Garganta-Revelation" -runTests -testPlatform EditMode -testResults results.xml`
