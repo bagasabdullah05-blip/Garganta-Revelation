@@ -116,6 +116,11 @@ namespace Garganta.Story
             int n = Mathf.Min(text.Length, (int)shown);
             GUILayout.BeginArea(new Rect(40, Screen.height - 190, Screen.width - 280, 150));
             GUILayout.BeginVertical("box");
+            GUILayout.BeginHorizontal();
+            GUI.color = SpeakerColor(speaker);
+            GUILayout.Box(string.IsNullOrEmpty(speaker) ? "?" : speaker.Substring(0, 1), GUILayout.Width(44), GUILayout.Height(44));
+            GUI.color = Color.white;
+            GUILayout.BeginVertical();
             if (!string.IsNullOrEmpty(speaker))
             {
                 GUI.color = SpeakerColor(speaker);
@@ -123,6 +128,8 @@ namespace Garganta.Story
                 GUI.color = Color.white;
             }
             GUILayout.Label(text.Substring(0, n));
+            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();
             GUILayout.Label($"[{idx + 1}/{lines.Count}] Space/klik: lanjut", new GUIStyle(GUI.skin.label) { fontSize = 10 });
             if (GUILayout.Button("Skip >>", GUILayout.Width(90))) { idx = lines.Count; Advance(); }

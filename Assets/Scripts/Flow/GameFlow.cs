@@ -52,9 +52,9 @@ namespace Garganta.Flow
             }
         }
 
-        public void NewGame()
+        public void NewGame(int difficulty = 1)
         {
-            SaveSystem.NewGame();
+            SaveSystem.NewGame(difficulty);
             SaveSystem.LastSlot = 1;
             ActiveNode = -1;
             State = FlowState.Map;

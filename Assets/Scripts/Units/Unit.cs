@@ -80,8 +80,7 @@ namespace Garganta.Units
         void MaxMPFromMag() => CoreStats.MaxMP = 20 + CoreStats.MAG * 2;
 
         public void RefreshStats()
-        {
-            Stats = CoreStats.Clone();
+        {            Stats = CoreStats.Clone();
             foreach (var kv in Equipped)
             {
                 var e = kv.Value;
@@ -103,6 +102,19 @@ namespace Garganta.Units
         }
 
         public static int XpNeed(int level) => Mathf.FloorToInt(100f * Mathf.Pow(level, 1.5f));
+
+        // Difficulty scaling for enemies (Story 0.8x ... Nightmare 1.5x).
+        public void ScaleStats(float mult)
+        {
+            CoreStats.ATK = Mathf.Max(1, Mathf.RoundToInt(CoreStats.ATK * mult));
+            CoreStats.DEF = Mathf.Max(0, Mathf.RoundToInt(CoreStats.DEF * mult));
+            CoreStats.MAG = Mathf.Max(1, Mathf.RoundToInt(CoreStats.MAG * mult));
+            CoreStats.MDEF = Mathf.Max(0, Mathf.RoundToInt(CoreStats.MDEF * mult));
+            CoreStats.MaxHP = Mathf.Max(1, Mathf.RoundToInt(CoreStats.MaxHP * mult));
+            RefreshStats();
+            HP = Stats.MaxHP;
+            MP = Stats.MaxMP;
+        }
 
         // Returns true if at least one level gained.
         public bool GainXP(int amount)

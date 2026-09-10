@@ -6,6 +6,8 @@ namespace Garganta.UI
 {
     public class TitleUI : MonoBehaviour
     {
+        bool pickDiff;
+
         void OnGUI()
         {
             var flow = GameFlow.Instance;
@@ -18,7 +20,24 @@ namespace Garganta.UI
             GUILayout.Label("REVELATION", title);
             GUILayout.Label("Dark Fantasy Tactical RPG — Act I", sub);
             GUILayout.Space(12);
-            if (GUILayout.Button("New Game", GUILayout.Height(36))) flow.NewGame();
+            if (!pickDiff)
+            {
+                if (GUILayout.Button("New Game", GUILayout.Height(36))) pickDiff = true;
+            }
+            else
+            {
+                GUILayout.Label("Difficulty:", sub);
+                for (int d = 0; d < 4; d++)
+                {
+                    int diff = d;
+                    if (GUILayout.Button($"{GameBalance.Name(diff)} (foe x{GameBalance.EnemyStatMult(diff)}, XP x{GameBalance.XpMult(diff)})"))
+                    {
+                        pickDiff = false;
+                        flow.NewGame(diff);
+                    }
+                }
+                if (GUILayout.Button("Back")) pickDiff = false;
+            }
             GUI.enabled = SaveSystem.SlotExists(SaveSystem.LastSlot) || SaveSystem.SlotExists(1);
             if (GUILayout.Button("Continue", GUILayout.Height(32))) flow.ContinueGame();
             GUI.enabled = true;

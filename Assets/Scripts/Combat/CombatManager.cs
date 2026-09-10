@@ -115,11 +115,12 @@ namespace Garganta.Combat
             CorruptionMods(attacker.Corruption, out float atkMult, out _);
             dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * atkMult));
             defender.TakeDamage(dmg);
+            if (!defender.IsAlive) Sfx("death");
             EventBus.Damage(attacker.UnitName, dmg, defender.UnitName);
             EventBus.Log($"{attacker.UnitName} hit {defender.UnitName} for {dmg}{(crit ? " CRIT" : "")}");
 
             Popup(defender.transform.position, dmg.ToString(), crit ? Color.red : Color.white);
-            Sfx(magical ? "skill_magic" : "hit");
+            Sfx(magical ? "skill_magic" : (attacker.Stats.Weapon == WeaponType.Bow ? "bow" : "hit"));
             var shake = FindAnyObjectByType<CameraShake>();
             if (shake != null) shake.AddShake(crit ? 0.5f : 0.2f);
             return dmg;
@@ -156,6 +157,7 @@ namespace Garganta.Combat
                         {
                             t.StunTurns = skill.StunTurns;
                             EventBus.Log($"{t.UnitName} is stunned!");
+                            Sfx("stun");
                         }
                         if (skill.StealGold && dmg > 0)
                         {
@@ -191,6 +193,7 @@ namespace Garganta.Combat
                             if (rsr != null) rsr.color = Color.white;
                             Popup(t.transform.position, "JOIN!", Color.cyan);
                             EventBus.Log($"{t.UnitName} joins the party!");
+                            Sfx("talk");
                         }
                         else EventBus.Log($"{t.UnitName} won't listen...");
                         break;
@@ -226,6 +229,7 @@ namespace Garganta.Combat
                         Popup(f.transform.position, "100", Color.yellow);
                     }
                 EventBus.Log($"{user.UnitName} threw a Bomb!");
+                Sfx("explosion");
                 return;
             }
             if (item.Revive)
@@ -238,6 +242,7 @@ namespace Garganta.Combat
                         if (sr != null) sr.color = Color.white;
                         Popup(a.transform.position, "REVIVE", Color.green);
                         EventBus.Log($"{a.UnitName} revived!");
+                        Sfx("revive");
                         return;
                     }
                 Inventory.Add(item.Id); // refund: nobody down

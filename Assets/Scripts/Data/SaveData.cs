@@ -42,5 +42,6 @@ namespace Garganta.Data
         public List<Bonds.BondEntry> bonds = new List<Bonds.BondEntry>();
         public bool hasEnding; // post-game unlocked (Primeval Lair)
         public bool ngPlus;
+        public int difficulty = 1; // 0 Story, 1 Normal, 2 Hard, 3 Nightmare
     }
 }

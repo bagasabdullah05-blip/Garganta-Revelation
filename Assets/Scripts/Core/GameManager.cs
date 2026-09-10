@@ -144,6 +144,8 @@ namespace Garganta.Core
                 if (cfg.RecruitIds != null && i < cfg.RecruitIds.Length) u.RecruitId = cfg.RecruitIds[i];
                 int lv = (cfg.EnemyLvls != null && i < cfg.EnemyLvls.Length) ? cfg.EnemyLvls[i] : cfg.EnemyLevel;
                 if (lv + ng > 1) u.ApplyLevel(lv + ng);
+                float em = GameBalance.EnemyStatMult(save != null ? save.difficulty : 1);
+                if (em != 1f) u.ScaleStats(em);
                 EnemyUnits.Add(u);
             }
         }
@@ -365,6 +367,7 @@ namespace Garganta.Core
             int xpEach = 0;
             foreach (var e in EnemyUnits) xpEach += 50 + e.Level * 25;
             if (alive.Count > 0) xpEach /= alive.Count;
+            xpEach = Mathf.RoundToInt(xpEach * GameBalance.XpMult(save != null ? save.difficulty : 1));
             var lines = new List<string> { $"Victory! +{xpEach} XP each" };
             foreach (var p in alive)
             {
@@ -373,14 +376,15 @@ namespace Garganta.Core
                 bool up = p.GainXP(xp);
                 p.AddMastery(p.ClassId, 5);
                 p.AddJobLevel(p.ClassId);
-                if (up) lines.Add($"{p.UnitName} reached Lv {p.Level}!");
+                if (up) { lines.Add($"{p.UnitName} reached Lv {p.Level}!"); Sfx("levelup"); }
             }
             if (save != null)
             {
                 foreach (var n in Bonds.RecordBattle(save, PlayerUnits)) lines.Add(n);
-                // Classic permadeath: the fallen stay fallen — except Kael (story armor).
+                // Classic permadeath (off on Story): the fallen stay fallen — except Kael.
+                bool pd = save != null && GameBalance.Permadeath(save.difficulty);
                 foreach (var u in PlayerUnits)
-                    if (!u.IsAlive && u.RosterId != "Kael")
+                    if (pd && !u.IsAlive && u.RosterId != "Kael")
                     {
                         save.roster.RemoveAll(r => r.rosterId == u.RosterId);
                         lines.Add($"{u.RosterId} has fallen... (permadeath)");
@@ -390,6 +394,7 @@ namespace Garganta.Core
             foreach (var e in EnemyUnits) gold += Random.Range(10, 31);
             Inventory.Gold += gold;
             lines.Add($"+{gold}G (purse {Inventory.Gold}G)");
+            Sfx("gold");
             foreach (var e in EnemyUnits)
             {
                 float r = Random.value;
@@ -417,6 +422,12 @@ namespace Garganta.Core
         {
             var am = FindAnyObjectByType<Garganta.Audio.AudioManager>();
             if (am != null) am.PlayMusic(id);
+        }
+
+        void Sfx(string id)
+        {
+            var am = FindAnyObjectByType<Garganta.Audio.AudioManager>();
+            if (am != null) am.PlaySfx(id);
         }
     }
 }

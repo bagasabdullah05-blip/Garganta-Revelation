@@ -38,9 +38,9 @@ namespace Garganta.Data
             if (File.Exists(path)) File.Delete(path);
         }
 
-        public static GameSave NewGame()
+        public static GameSave NewGame(int difficulty = 1)
         {
-            var save = new GameSave { version = 3, progress = 0, gold = 200 };
+            var save = new GameSave { version = 4, progress = 0, gold = 200, difficulty = difficulty };
             save.roster.Add(MakeUnit("Kael", "Squire", 2, "iron_sword", "", "", ""));
             save.roster.Add(MakeUnit("Briar", "Squire", 1, "hand_axe", "", "", ""));
             save.stock.Add(new StockEntry { id = "potion", count = 3 });
