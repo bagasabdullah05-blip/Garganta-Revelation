@@ -306,6 +306,53 @@ namespace Garganta.Core
 
         public void PlayerWait() => EndPlayerAction();
 
+        // Test/auto-play hooks: drive the active player unit without mouse input.
+        public void DebugPlayerAttack()
+        {
+            if (CurrentUnit == null) return;
+            Unit victim = null;
+            foreach (var f in EnemyUnits)
+            {
+                if (!f.IsAlive) continue;
+                if (HexDist(CurrentUnit.Coord, f.Coord) <= CurrentUnit.Stats.Range && (victim == null || f.HP < victim.HP))
+                    victim = f;
+            }
+            if (victim != null) combat.Attack(CurrentUnit, victim);
+            EndPlayerAction();
+        }
+
+        public void DebugPlayerMoveToward()
+        {
+            if (CurrentUnit == null) return;
+            Unit foe = null;
+            int best = int.MaxValue;
+            foreach (var f in EnemyUnits)
+            {
+                if (!f.IsAlive) continue;
+                int d = HexDist(CurrentUnit.Coord, f.Coord);
+                if (d < best) { best = d; foe = f; }
+            }
+            if (foe == null) { EndPlayerAction(); return; }
+            SelectedUnit = CurrentUnit;
+            var reach = AITactics.ReachableTiles(grid, CurrentUnit.Coord, CurrentUnit.Stats.Move);
+            Vector2Int dest = AITactics.BestTile(CurrentUnit, foe, reach, grid);
+            if (dest != CurrentUnit.Coord)
+            {
+                var path = Pathfinder.FindPath(grid, CurrentUnit.Coord, dest, CurrentUnit.Stats.Move);
+                if (path != null)
+                {
+                    grid.MoveOccupant(CurrentUnit, dest);
+                    CurrentUnit.Coord = dest;
+                    StartCoroutine(CurrentUnit.GetComponent<UnitMovement>().FollowPath(path, grid, null));
+                }
+            }
+            if (HexDist(CurrentUnit.Coord, foe.Coord) <= CurrentUnit.Stats.Range)
+            {
+                combat.Attack(CurrentUnit, foe);
+                EndPlayerAction();
+            }
+        }
+
         void EndPlayerAction()
         {
             CancelTargeting();

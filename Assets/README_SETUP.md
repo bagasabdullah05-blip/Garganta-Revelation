@@ -78,9 +78,11 @@ Regenerasi bila perlu: New Scene → menu **Garganta → Setup TestBattle Scene*
 
 ## Tests
 Window → General → Test Runner → EditMode → Run All.
-Harus hijau 93: Pathfinder(3), CTB(3), Damage(4), Triangle(6), Leveling(5),
-Skill(6), Equipment(6), Save(3), Chapter(5), Shop(5), Job(5), Bond(4),
-Corruption(3), Recruit(2), Rep(1), Tier3(4), Ending(5), Skirmish(3), Wave(3),
-ArtAudio(5), Difficulty(5), AudioAssets(2), Crafting(4) + 1 stub Addressables.
+Harus hijau 98 EditMode: Pathfinder(3), CTB(3), Damage(4), Triangle(6),
+Leveling(5), Skill(6), Equipment(6), Save(3), Chapter(5), Shop(5), Job(5),
+Bond(4), Corruption(3), Recruit(2), Rep(1), Tier3(4), Ending(5), Skirmish(3),
+Wave(3), ArtAudio(5), Difficulty(5), AudioAssets(2), Crafting(4),
+BattleSim(5) + 1 stub Addressables — plus 1 PlayMode auto-play (battle
+4v6 main sendiri sampai Victory).
 Bisa juga headless:
 `Unity.exe -batchmode -quit -projectPath "K:\unity\Garganta-Revelation" -runTests -testPlatform EditMode -testResults results.xml`

@@ -42,29 +42,57 @@ namespace Garganta.AI
 
         public static Unit FindTarget(Unit self, List<Unit> enemies, GridManager grid)
         {
+            // Nearest foe; Defensive holds unless already in reach. (Aggressive must
+            // advance across the map — a pure in-reach filter camps at spawn forever.)
             Unit best = null;
+            int bestD = int.MaxValue;
             foreach (var e in enemies)
             {
                 if (!e.IsAlive) continue;
                 int d = GridManager.HexDistance(self.Coord, e.Coord);
-                if (d > self.Stats.Move + e.Stats.Range + self.Stats.Range) continue; // rough reach check
-                if (d > self.Stats.Move + self.Stats.Range && self.Behavior == AIBehavior.Defensive) continue;
-                if (best == null || e.HP < best.HP) best = e;
+                if (self.Behavior == AIBehavior.Defensive && d > self.Stats.Move + self.Stats.Range) continue;
+                if (best == null || d < bestD || (d == bestD && e.HP < best.HP)) { bestD = d; best = e; }
             }
             return best;
         }
 
         public static Vector2Int BestTile(Unit self, Unit target, HashSet<Vector2Int> reachable, GridManager grid)
         {
+            // Phase 1: attack stance — highest DEF among tiles that can strike now.
+            // Phase 2: approach — strictly close distance (tie-break: DEF).
+            // (Single-score DEF-chasing turtles in forests and never finishes battles.)
             Vector2Int best = self.Coord;
+            if (target != null)
+            {
+                int bestDef = int.MinValue;
+                bool found = false;
+                foreach (var t in reachable)
+                {
+                    var occ = grid.Tiles[t.x, t.y].Occupant;
+                    if (occ != null && occ != self) continue;
+                    if (GridManager.HexDistance(t, target.Coord) > self.Stats.Range) continue;
+                    int def = Balance.DefBonus(grid.Tiles[t.x, t.y].Type);
+                    if (!found || def > bestDef) { bestDef = def; best = t; found = true; }
+                }
+                if (found) return best;
+                int bestD = GridManager.HexDistance(self.Coord, target.Coord);
+                bestDef = int.MinValue;
+                foreach (var t in reachable)
+                {
+                    var occ = grid.Tiles[t.x, t.y].Occupant;
+                    if (occ != null && occ != self) continue;
+                    int d = GridManager.HexDistance(t, target.Coord);
+                    int def = Balance.DefBonus(grid.Tiles[t.x, t.y].Type);
+                    if (d < bestD || (d == bestD && def > bestDef)) { bestD = d; bestDef = def; best = t; }
+                }
+                return best;
+            }
             int bestScore = int.MinValue;
             foreach (var t in reachable)
             {
                 var occ = grid.Tiles[t.x, t.y].Occupant;
                 if (occ != null && occ != self) continue;
                 int score = Balance.DefBonus(grid.Tiles[t.x, t.y].Type) * 10;
-                if (target != null && GridManager.HexDistance(t, target.Coord) <= self.Stats.Range) score += 100;
-                if (target != null) score -= GridManager.HexDistance(t, target.Coord);
                 if (score > bestScore) { bestScore = score; best = t; }
             }
             return best;

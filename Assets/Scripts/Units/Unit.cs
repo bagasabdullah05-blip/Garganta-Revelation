@@ -17,6 +17,7 @@ namespace Garganta.Units
         public Dictionary<string, int> JobLevels = new Dictionary<string, int>();
         public int Corruption; // 0-100 Aether corruption (M4)
         public string RecruitId; // set on enemies that can be Talk-recruited (M4)
+        public float StatMult = 1f; // enemy mook penalty (0.7x); restored on recruit
         public int Level = 1;
         public int XP = 0;
         public int MP;
@@ -150,7 +151,7 @@ namespace Garganta.Units
             MP = Stats.MaxMP;
         }
 
-        void ApplyGrowth(ClassRecord rec)
+        void ApplyGrowth(ClassRecord rec, bool withHp = true)
         {
             CoreStats.MaxHP += rec.GHP;
             CoreStats.ATK += rec.GATK;
@@ -158,7 +159,18 @@ namespace Garganta.Units
             CoreStats.MAG += rec.GMAG;
             CoreStats.MDEF += rec.GMDEF;
             CoreStats.SPD += rec.GSPD;
-            HP += rec.GHP;
+            if (withHp) HP += rec.GHP;
+        }
+
+        // Full rebuild at current level (recruit penalty removal / reclass repair).
+        public void RebuildStats()
+        {
+            var rec = ClassDatabase.Get(ClassId);
+            CoreStats = rec.Base.Clone();
+            for (int i = 1; i < Level; i++) ApplyGrowth(rec, false);
+            RefreshStats();
+            HP = Stats.MaxHP;
+            MP = Stats.MaxMP;
         }
 
         public UnitSave Capture()

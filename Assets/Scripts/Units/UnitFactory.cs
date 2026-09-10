@@ -31,6 +31,8 @@ namespace Garganta.Units
             ["BlightHeart"] = "void_tome", ["Usurper"] = "shadowfang", ["Primeval"] = "gungnir",
         };
 
+        static bool IsBoss(string id) => id == "BlightHeart" || id == "Usurper" || id == "Primeval";
+
         public static Unit Create(string id, bool isPlayer, Vector2Int coord, GridManager grid)
         {
             string classId = unitClass.TryGetValue(id, out var c) ? c : "Squire";
@@ -43,6 +45,16 @@ namespace Garganta.Units
             unit.Init(isPlayer ? $"P_{id}" : $"E_{id}_{coord}", id, isPlayer, rec.Base, coord);
             unit.RosterId = id;
             unit.SetClass(classId);
+            if (!isPlayer && !IsBoss(id))
+            {
+                // Mook penalty: rank-and-file foes hit softer than same-class heroes.
+                unit.StatMult = 0.7f;
+                unit.CoreStats.ATK = Mathf.Max(1, Mathf.RoundToInt(unit.CoreStats.ATK * 0.7f));
+                unit.CoreStats.DEF = Mathf.Max(0, Mathf.RoundToInt(unit.CoreStats.DEF * 0.7f));
+                unit.CoreStats.MAG = Mathf.Max(1, Mathf.RoundToInt(unit.CoreStats.MAG * 0.7f));
+                unit.CoreStats.MDEF = Mathf.Max(0, Mathf.RoundToInt(unit.CoreStats.MDEF * 0.7f));
+                unit.CoreStats.MaxHP = Mathf.Max(1, Mathf.RoundToInt(unit.CoreStats.MaxHP * 0.7f));
+            }
             if (unitWeapon.TryGetValue(id, out var wid))
                 unit.Equipped[EquipSlot.Weapon] = EquipmentData.FindWeapon(wid);
             unit.RefreshStats();

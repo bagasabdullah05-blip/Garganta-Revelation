@@ -188,6 +188,8 @@ namespace Garganta.Combat
                             t.IsPlayer = true;
                             t.RosterId = t.RecruitId;
                             t.RecruitId = "";
+                            t.StatMult = 1f;
+                            t.RebuildStats();
                             t.Behavior = Garganta.AI.AIBehavior.Aggressive;
                             var rsr = t.GetComponent<SpriteRenderer>();
                             if (rsr != null) rsr.color = Color.white;
