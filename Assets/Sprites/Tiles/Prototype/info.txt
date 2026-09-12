@@ -1,0 +1,6 @@
+Garganta Revelation - Prototype Tileset v1
+Tile canvas: 64x64 (diamond 64x32 at y offset 32)
+Diamond points: (32,32) top? no -> diamond rows y=32..64
+Seed: 42 (deterministic, regenerate identik)
+Tiles: plains, plains_alt, forest, mountain, water_f0, water_f1, ruins, blight, wall, bridge
+Catatan: programmer art, siap dipoles via AI image.
