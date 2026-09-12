@@ -34,6 +34,8 @@ Dark Fantasy Tactical RPG — Turn-Based Strategy dengan depth ala Final Fantasy
 | [Class System](docs/CLASS_SYSTEM.md) | Job trees, skill lists, progression |
 | [Equipment System](docs/EQUIPMENT_SYSTEM.md) | Weapons, armor, items, crafting |
 | [Content Plan](docs/CONTENT_PLAN.md) | Chapters, encounters, recruitment |
+| [Asset Generation Guide](docs/ASSET_GENERATION_GUIDE.md) | Prompt AI + cara pasang di Unity |
+| [Asset Checklist](docs/ASSET_CHECKLIST.md) | Status aset yang dibutuhkan |
 
 ## Quick Start (Development)
 
