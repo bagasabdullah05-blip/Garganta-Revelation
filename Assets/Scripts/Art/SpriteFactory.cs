@@ -42,6 +42,21 @@ namespace Garganta.Art
             return s;
         }
 
+        // 64x32 white diamond for range highlights (matches 2:1 tile art).
+        public static Sprite WhiteDiamond()
+        {
+            const string key = "hl_diamond";
+            if (cache.TryGetValue(key, out var s)) return s;
+            var t = NewTex(64, 64);
+            for (int y = 16; y < 48; y++)
+                for (int x = 0; x < 64; x++)
+                {
+                    float d = Mathf.Abs(x - 31.5f) / 32f + Mathf.Abs(y - 31.5f) / 16f;
+                    if (d <= 1f) t.SetPixel(x, y, Color.white);
+                }
+            return Make(key, t, 64f);
+        }
+
         // 64x48 diamond -> 1 x 0.75 world. Beveled: light top facet, dark bottom + outline.
         public static Sprite Diamond(Color fill)
         {

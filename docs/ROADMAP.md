@@ -29,6 +29,11 @@ Exit criteria:
 - [ ] Batchmode import bersih + 99 tests tetap hijau
 - [ ] Ikon tampil di UI (wiring kecil, lihat P1 task list di bawah)
 
+Status 13 Sep: tileset prototype v1 (11 PNG, `Assets/Sprites/Tiles/Prototype/`)
+SUDAH TERWIRE via `ArtOverride` — engine pindah ke diamond 2:1 (row 0.5),
+forest/mountain/wall pakai art terintegrasi, plains_alt variasi checker.
+Sisa P1: heroes (4+4), enemies (3 file), backgrounds (3), icons (27).
+
 P1 tasks (code, kecil): tampilkan `icon_<id>` di ActionMenu/ItemMenu/skill list;
 tampilkan `portrait_<Nama>` di DialogueUI; `bg_title/bg_map/bg_base` di
 Title/WorldMap/Base. Estimasi ±150 baris, tanpa ubah sistem.

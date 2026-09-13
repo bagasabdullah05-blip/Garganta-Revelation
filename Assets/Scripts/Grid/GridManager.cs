@@ -12,11 +12,11 @@ namespace Garganta.Grid
         public int Height = Balance.MapHeight;
         public HexTile[,] Tiles;
 
-        // Staggered world layout: x offset on odd rows, row height 0.75 (hex packing).
+        // Staggered world layout: x offset on odd rows, 2:1 diamonds (row height 0.5).
         public Vector3 CoordToWorld(Vector2Int c)
         {
             float x = c.x + 0.5f * (c.y & 1);
-            float y = c.y * 0.75f;
+            float y = c.y * 0.5f;
             return new Vector3(x, y, 0);
         }
 
@@ -26,7 +26,7 @@ namespace Garganta.Grid
 
         public Vector2Int WorldToCoord(Vector3 w)
         {
-            int row = Mathf.RoundToInt(w.y / 0.75f);
+            int row = Mathf.RoundToInt(w.y / 0.5f);
             int col = Mathf.RoundToInt(w.x - 0.5f * (row & 1));
             row = Mathf.Clamp(row, 0, Height - 1);
             col = Mathf.Clamp(col, 0, Width - 1);

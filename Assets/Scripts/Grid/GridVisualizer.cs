@@ -72,10 +72,17 @@ namespace Garganta.Grid
                             break;
                         case TileType.Wall:
                             sr.sprite = SpriteFactory.WallBlock();
-                            sr.sortingOrder = order + 4;
+                            sr.sortingOrder = order + 6;
                             break;
                         default:
                             sr.sprite = SpriteFactory.Diamond(Balance.TileColor(t.Type));
+                            if (t.Type == TileType.Plains && ((x + y) & 1) == 0)
+                            {
+                                var alt = ArtOverride.Get("dia_59724C_alt");
+                                if (alt != null) sr.sprite = alt;
+                            }
+                            if (t.Type == TileType.Forest || t.Type == TileType.Mountain)
+                                sr.sortingOrder = order + 3; // integrated tree/peak overlaps row behind
                             break;
                     }
 
@@ -85,9 +92,9 @@ namespace Garganta.Grid
                     hl.transform.position = pos;
                     hl.transform.SetParent(go.transform);
                     var hsr = hl.AddComponent<SpriteRenderer>();
-                    hsr.sprite = SpriteFactory.Diamond(Color.white);
+                    hsr.sprite = SpriteFactory.WhiteDiamond();
                     hsr.color = new Color(1, 1, 1, 0);
-                    hsr.sortingOrder = order + 3;
+                    hsr.sortingOrder = order + 7;
                     highlights[x, y] = hl;
                 }
         }
@@ -98,8 +105,7 @@ namespace Garganta.Grid
             Vector3 off = Vector3.zero;
             switch (t.Type)
             {
-                case TileType.Forest: deco = SpriteFactory.Tree(); off = new Vector3(0, 0.55f, 0); break;
-                case TileType.Mountain: deco = SpriteFactory.Rock(); off = new Vector3(0, 0.28f, 0); break;
+                // Forest/Mountain art already includes tree/peak — no separate deco.
                 case TileType.Plains:
                     if ((t.Coord.x * 7 + t.Coord.y * 13) % 5 == 0) { deco = SpriteFactory.Tuft(); off = new Vector3(0.1f, 0.1f, 0); }
                     break;
@@ -110,7 +116,7 @@ namespace Garganta.Grid
             go.transform.SetParent(transform);
             var sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = deco;
-            sr.sortingOrder = order + 2;
+            sr.sortingOrder = order + 1;
         }
 
         void Update()
