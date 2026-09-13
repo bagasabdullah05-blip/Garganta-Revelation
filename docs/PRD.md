@@ -228,23 +228,25 @@ com.unity.textmeshpro
 com.unity.addressables
 ```
 
-## 10. Development Milestones
+## 10. Development Milestones (revisi 10 Sep 2026 — prototype done, visual dulu)
 
-| Milestone | Goal | Duration |
+| Phase | Goal | Status |
 |---|---|---|
-| **M1 — Prototype** | Mainable grid combat | Minggu 1-3 |
-| **M2 — Core** | Full combat system | Bulan 1-2 |
-| **M3 — World** | Playable Chapter 1-2 | Bulan 3-4 |
-| **M4 — Content** | All 12 chapters playable | Bulan 5-8 |
-| **M5 — Production** | Polish & art integration | Bulan 9-11 |
-| **M6 — Launch** | Release ready | Bulan 12 |
+| **P0 — Prototype** | Semua sistem playable + 99 tests | ✅ Done |
+| **P1 — Visual Foundation** | Full art Title→Ch.2b (±56 file), tanpa placeholder | 🎯 Now |
+| **P2 — Feel & Balance** | Animasi code, SFX wiring, tuning, bugfix playtest | Next |
+| **P3 — Content Art** | Sisa cast Ch.3–Ch.11 + bosses + portraits | Planned |
+| **P4 — Launch** | Musik final, mobile, lokalisasi, store | Planned |
+
+Detail + exit criteria: `docs/ROADMAP.md`. Prompt generate per aset:
+`docs/prompts/phase1/`. Pipeline drop-in tanpa ubah code: `docs/ART_TASKS.md`.
 
 ## 11. Risk Assessment
 
 | Risk | Impact | Likelihood | Mitigation |
 |---|---|---|---|
 | Scope creep | High | High | Strict adherence to milestones |
-| Art asset delays | Medium | Medium | Use placeholder first, art last |
+| Art asset delays | Medium | Medium | Phase 1 art dulu + placeholder fallback otomatis |
 | Mobile performance | High | Medium | Profile early, optimize often |
 | Balancing too hard | Medium | Medium | Playtest at each milestone |
 | Burnout | High | Medium | Sustainable pace, celebrate small wins |

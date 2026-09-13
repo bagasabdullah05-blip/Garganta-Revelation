@@ -1,5 +1,9 @@
 # Art Tasks — Garganta Revelation (M6 Production)
 
+> KERJA SEKARANG = **Phase 1** (`docs/ROADMAP.md`): visual lock Title→Ch.2b.
+> Prompt copy-paste per aset di `docs/prompts/phase1/` (STYLE + characters +
+> enemies + tiles + backgrounds + icons). File ini = spec + pipeline.
+
 Procedural placeholders ship the game TODAY; this file turns them into final
 HD-2D pixel art without touching code. Import `docs/PALETTE.gpl` into
 Aseprite/GIMP/Piskel first (palettes locked to `docs/ART_BRIEF.md`).
@@ -60,6 +64,12 @@ Trims: player `4A6B8A`, enemy `8B2500`.
 Examples: redraw ONE file `Assets/Resources/Art/char_Sword_4A6B8A.png`
 (Kael) and he changes in-game next Play; everything else stays placeholder.
 Mix-and-match freely — missing names fall back silently.
+
+Nama tambahan (wiring tampil = P1 code task, lihat ROADMAP):
+portrait `portrait_<Nama>` (128x128, mis. `portrait_Kael.png`),
+background `bg_title` / `bg_map` / `bg_base`,
+icon `icon_<id>` di `Assets/Resources/Art/Icons/` (mis. `icon_PowerStrike.png`,
+`icon_potion.png`, `icon_iron_sword.png`).
 
 ## 5. Acceptance checklist per asset
 
