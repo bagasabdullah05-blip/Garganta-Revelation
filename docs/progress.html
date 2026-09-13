@@ -124,74 +124,103 @@ function copyText(t,msg){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(()=>fallback())}else fallback();
   function fallback(){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){}document.body.removeChild(ta)}
 }
-const PROMPTS=[
-["STYLE.md — tempel di tiap prompt","p-style"],
-["characters.md — heroes + portrait","p-char"],
-["enemies.md — Bandit/Goblin/Cultist","p-ene"],
-["tiles.md — diamond + decor","p-tile"],
-["backgrounds.md — title/map/base","p-bg"],
-["icons.md — skill/item/gear/menu","p-ico"],
-["areas_ch1.md — props + menu Ch.1","p-area"]];
+const SUF="2d pixel art, HD-2D style, desaturated dark fantasy palette, gritty war-torn mood, dramatic contrast, clean silhouette readable at 1x size, solid flat colors, no gradients, no photorealistic details, no blur, no watermark, transparent background";
+const CARDS=[
+["Heroes","Kael — sprite","char_Sword_4A6B8A.png 32x48","2d pixel art game sprite, male squire age 22, short messy ash-grey hair, pale blue tired eyes, burn scar on neck, worn dark brown leather chestpiece over chainmail collar, tattered dark grey cloak torn left shoulder, dented iron bracers, muddy boots, holding chipped iron short sword down-right, steel-blue shoulder trim, full body front-facing idle battle stance, "+SUF],
+["Heroes","Kael — anims","anim_Kael_idle/walk/attack/skill/hit/death (strip 32x48/frame)", "Same Kael, img2img dari sprite (seed sama). idle(2f): breath, sword lowered. walk(4f): stride, cloak sway. attack(4f): horizontal slash windup-strike-recover. skill(4f): overhead holy slash + light burst. hit(2f): flinch, hand to chest. death(4f): kneel, collapse, staring at hand. "+SUF],
+["Heroes","Kael — portraits","portrait_Kael[_battle,_sad,_happy].png 128x128","2d pixel art portrait bust, male 22 ash-grey messy hair pale blue eyes neck scar, dramatic rim light, muted palette, centered 3/4 view, dark vignette, no text. normal: stoic frown. battle: yell. sad: eyes closed. happy: rare small smile."],
+["Heroes","Briar — sprite","char_Axe_4A6B8A.png 32x48","2d pixel art game sprite, fierce female warrior age 28, long braided auburn hair, amber eyes, scar right cheek, dark grey steel armor red accents, wolf fur collar, heavy pauldrons, war axe resting on shoulder, steel-blue shoulder trim, full body front-facing idle battle stance, "+SUF],
+["Heroes","Briar — anims","anim_Briar_*","Same Briar, img2img. idle(2f): confident, axe butt on ground. walk(4f): heavy armored march. attack(4f): overhead swing, body twist. skill(4f): war cry slash + red burst. hit(2f): stagger grit teeth. death(4f): fall to knees, axe planted. "+SUF],
+["Heroes","Briar — portraits","portrait_Briar[_battle,_sad,_happy].png 128x128","2d pixel art portrait bust, female 28 braided auburn hair amber fierce eyes cheek scar, dramatic rim light, muted palette, centered 3/4, dark vignette, no text. normal: smirk. battle: shout. sad: jaw clenched. happy: genuine laugh."],
+["Heroes","Sera — sprite","char_Staff_4A6B8A.png 32x48","2d pixel art game sprite, gentle female healer age 19, long straight platinum blonde hair, soft violet eyes, white robes gold trim holy chest symbol, wooden staff with soft glow, white headdress, healing pouch, steel-blue sash trim, full body front-facing idle gentle pose, "+SUF],
+["Heroes","Sera — anims","anim_Sera_*","Same Sera, img2img. idle(2f): hover-sway, staff upright. walk(4f): graceful glide, robes flow. attack(2f): reluctant staff poke. skill(4f): staff raised, green-gold swirl. hit(2f): startled step back. death(4f): sink down, staff falling. "+SUF],
+["Heroes","Sera — portraits","portrait_Sera[_battle,_sad,_happy].png 128x128","2d pixel art portrait bust, female 19 platinum straight hair violet gentle eyes, dramatic rim light, muted palette, centered 3/4, dark vignette, no text. normal: warm smile. battle: chanting focus. sad: tearful. happy: bright hopeful."],
+["Heroes","Voss — sprite","char_Bow_4A6B8A.png 32x48","2d pixel art game sprite, quiet male ranger age 25, shoulder dark green-brown hair, sharp green eyes, green leather jerkin Valenwood pattern, hooded forest cloak leaf motif, composite longbow held left, quiver arrows on back, silent boots, steel-blue arrow fletching trim, full body front-facing idle stance, "+SUF],
+["Heroes","Voss — anims","anim_Voss_*","Same Voss, img2img. idle(2f): relaxed alert, bow lowered. walk(4f): light careful stride. attack(4f): quick draw aim release. skill(4f): piercing shot, arrow glow. hit(2f): sidestep wince. death(4f): crumple, quiver spilling. "+SUF],
+["Heroes","Voss — portraits","portrait_Voss[_battle,_sad,_happy].png 128x128","2d pixel art portrait bust, male 25 green-brown shoulder hair sharp green eyes, dramatic rim light, muted palette, centered 3/4, dark vignette, no text. normal: bored neutral. battle: sharp focus. sad: sarcastic smirk. happy: serious squint."],
+["Enemies","Bandit set","char_Sword_8B2500.png + anim_Bandit_*","2d pixel art game sprite, desperate hooded bandit, mismatched dented armor brown grey, rusty short sword, red sash trim, full body front-facing menacing idle stance, "+SUF+" Strip img2img: idle(2f) weight shift, walk(4f) skulking, attack(4f) wild slash, hit(2f) knockback, death(4f) collapse."],
+["Enemies","Goblin set","char_Dagger_8B2500.png + anim_Goblin_* (dipakai Wolf/Skeleton sementara)","2d pixel art game sprite, small green goblin, big ears, hunched, sharp teeth, crude knife, brown rags, red war-paint trim, full body front-facing feral idle stance, "+SUF+" Strip img2img: idle(2f) bounce ear twitch, walk(4f) scamper, attack(4f) leaping stab, hit(2f) squash, death(4f) poof."],
+["Enemies","Cultist set","char_Tome_8B2500.png + anim_Cultist_*","2d pixel art game sprite, hooded cultist, dark purple robe black trim, spider sigil chest, chained floating grimoire beside hand, glowing purple eyes in shadow, red trim, full body front-facing chanting pose, "+SUF+" Strip img2img: idle(2f) sway, walk(4f) glide, attack(4f) dark bolt, skill(4f) void tendrils, hit(2f) recoil, death(4f) crumple to ash."],
+["Tiles","plains","dia_59724C.png 64x48","isometric diamond game tile top-down 2:1, dull green worn grass, dirt patches, tiny flowers, beveled edge light top dark outline, seamless edges, "+SUF],
+["Tiles","plains alt","dia_59724C_alt.png 64x48","isometric diamond game tile top-down 2:1, worn grass VARIANT shade (checker pair), dirt patches, seamless edges, "+SUF],
+["Tiles","forest","dia_3A5E3A.png 64x48 (+ pohon terintegrasi)","isometric diamond game tile top-down 2:1, mossy forest floor dark soil with one ancient tall tree growing from tile, dense canopy, seamless edges, "+SUF],
+["Tiles","mountain","dia_6B6B72.png 64x48 (+ peak terintegrasi)","isometric diamond game tile top-down 2:1, grey rock slabs peak rising from tile, snow dust top, seamless edges, "+SUF],
+["Tiles","bridge","bridge.png 64x48","isometric diamond game tile top-down 2:1, wooden planks over stone, side rails, seamless edges, "+SUF],
+["Tiles","ruin","ruin.png 64x48","isometric diamond game tile top-down 2:1, cracked stone slabs, overgrown debris, seamless edges, "+SUF],
+["Tiles","water 2 frame","water0.png water1.png 64x48","isometric diamond game tile top-down 2:1, deep blue water. Frame1: ripple bergeser 4px (beda ripple SAJA), seamless edges, "+SUF],
+["Tiles","blight 2 frame","blight0.png blight1.png 64x48","isometric diamond game tile top-down 2:1, sickly teal corrupted ground, glowing veins. Frame1: vein lebih tebal (beda vein SAJA), seamless edges, "+SUF],
+["Tiles","tree","tree.png 48x64","ancient tall tree game asset, dense canopy, moss trunk, transparent background, "+SUF],
+["Tiles","rock","rock.png 40x32","grey boulder game asset, teal moss crack, transparent background, "+SUF],
+["Tiles","wall","wall.png 64x64","dark stone block wall game asset, brick lines, mossy top, transparent background, "+SUF],
+["Tiles","tuft","tuft.png 24x16","small grass tuft cluster game asset, transparent background, "+SUF],
+["Tiles","shadow","shadow.png 32x12","soft black ellipse 35 percent opacity, transparent background"],
+["Backgrounds","title","bg_title.png 960x540","dark fantasy key art, ruined castle silhouette on ash plain, embers rising, distant fire horizon, overcast grey-teal sky, lone swordsman back-view foreground, gritty painterly, muted desaturated palette, no text no logo, 16:9 composition"],
+["Backgrounds","world map","bg_map.png 1024x1024","aged parchment world map, hand-drawn ink, five regions golden sanctum grey citadel green elderwood black spire blue bastion, compass rose, dotted travel routes, burnt edges, top-down flat, muted ink palette, no text labels"],
+["Backgrounds","bastion","bg_base.png 960x540","medieval bastion interior hub, stone hall, war table with map, weapon racks, chapel corner candle glow, workshop forge embers background, warm torchlight vs cold window light, painterly, no people, no text"],
+["Icons","pattern","icon_* 32x32 (target di bawah)","fantasy RPG skill icon, MOTIF, WARNA, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","Attack","icon_Attack.png","fantasy RPG skill icon, crossed steel sword, steel grey, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","Talk","icon_Talk.png","fantasy RPG skill icon, speech bubble with watching eye, bone white, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","PowerStrike","icon_PowerStrike.png","fantasy RPG skill icon, sword cleaving down with impact burst, gold, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","ShieldBash","icon_ShieldBash.png","fantasy RPG skill icon, shield slam with stun stars, steel grey, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","WarCry","icon_WarCry.png","fantasy RPG skill icon, shouting horned helm with sound waves, blood red, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","Pierce","icon_Pierce.png","fantasy RPG skill icon, spear thrust with pierce lines, steel grey, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","AimedShot","icon_AimedShot.png","fantasy RPG skill icon, arrow with crosshair, forest green, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","QuickShot","icon_QuickShot.png","fantasy RPG skill icon, three swift arrows, sky blue, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","HealingLight","icon_HealingLight.png","fantasy RPG skill icon, glowing open hand with green-gold swirl, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","Smite","icon_Smite.png","fantasy RPG skill icon, hammer of holy light, gold-white, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","Cure","icon_Cure.png","fantasy RPG skill icon, water droplet with sparkle cleanse, teal, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","Skill menu","icon_Skill.png","fantasy RPG skill icon, crossed magic sparks, cyan, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","Item menu","icon_Item.png","fantasy RPG skill icon, leather pouch, brown, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","Wait menu","icon_Wait.png","fantasy RPG skill icon, hourglass, bone white, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","potion","icon_potion.png","fantasy RPG item icon, red flask potion, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","hi-potion","icon_hi_potion.png","fantasy RPG item icon, big red flask with gold cap, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","ether","icon_ether.png","fantasy RPG item icon, blue vial, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","antidote","icon_antidote.png","fantasy RPG item icon, green vial with leaf, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","phoenix down","icon_phoenix_down.png","fantasy RPG item icon, orange feather wreathed in flame, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","bomb","icon_bomb.png","fantasy RPG item icon, black round bomb with lit fuse spark, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","elixir","icon_elixir.png","fantasy RPG item icon, gold flask with wing motif, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","tent","icon_tent.png","fantasy RPG item icon, canvas tent triangle, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","iron sword","icon_iron_sword.png","fantasy RPG item icon, straight steel sword, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","hand axe","icon_hand_axe.png","fantasy RPG item icon, small war axe, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","wooden staff","icon_wooden_staff.png","fantasy RPG item icon, wooden staff with glowing orb, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","short bow","icon_short_bow.png","fantasy RPG item icon, short wooden bow, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","rusty sword","icon_rusty_sword.png","fantasy RPG item icon, rusty chipped sword, brown, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","leather armor","icon_leather_armor.png","fantasy RPG item icon, leather cuirass, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","iron helm","icon_iron_helm.png","fantasy RPG item icon, iron helmet, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Icons","power band","icon_power_band.png","fantasy RPG item icon, red armband with gold trim, centered emblem, thick dark outline, flat colors, transparent background, no text, "+SUF],
+["Props","burnt house","deco_house.png 64x96 (tile 3,2)","burnt war-torn village prop, collapsed timber house with stone chimney and ember glow, dark fantasy, muted palette, isometric game asset, transparent background, "+SUF],
+["Props","debris 0","deco_debris0.png 48x32","burnt war-torn village prop, broken cart wheel with planks, dark fantasy, muted palette, isometric game asset, transparent background, "+SUF],
+["Props","debris 1","deco_debris1.png 48x32","burnt war-torn village prop, rubble stones with ash pile, dark fantasy, muted palette, isometric game asset, transparent background, "+SUF],
+["Props","debris 2","deco_debris2.png 48x32","burnt war-torn village prop, fallen beam with cloth scrap, dark fantasy, muted palette, isometric game asset, transparent background, "+SUF],
+["Props","dead tree","deco_deadtree.png 48x64","burnt war-torn village prop, leafless black tree, dark fantasy, muted palette, isometric game asset, transparent background, "+SUF]
+];
+const GROUPS=["All","Heroes","Enemies","Tiles","Backgrounds","Icons","Props"];
+let gfilter="All";
 function renderPrompts(){
-  let html="";
-  PROMPTS.forEach(p=>{
-    const body=document.getElementById(p[1]).textContent;
-    html+=`<div class="prompt"><div class="head"><b>${p[0]}</b><button data-t="${p[1]}">Copy ⧉</button></div><pre></pre></div>`;
+  let html='<div style="margin:10px 0;display:flex;gap:8px;flex-wrap:wrap">';
+  GROUPS.forEach(g=>{html+=`<button onclick="setG('${g}')" style="background:${gfilter===g?"var(--teal)":"var(--panel)"};color:var(--ink);border:1px solid var(--gold);border-radius:6px;padding:6px 12px;cursor:pointer">${g}</button>`});
+  html+="</div>";
+  CARDS.forEach((c,i)=>{
+    if(gfilter!=="All"&&c[0]!==gfilter)return;
+    html+=`<div class="prompt"><div class="head"><b>${c[0]} — ${c[1]}<br><span style="color:var(--dim);font-size:12px">${c[2]}</span></b><button data-i="${i}">Copy ⧉</button></div><pre></pre></div>`;
   });
   document.getElementById("prompts").innerHTML=html;
   const pres=document.querySelectorAll("#prompts pre");
-  PROMPTS.forEach((p,i)=>{pres[i].textContent=document.getElementById(p[1]).textContent.trim()});
-  document.querySelectorAll("#prompts button").forEach(b=>b.onclick=()=>copyText(document.getElementById(b.dataset.t).textContent.trim(),"Prompt tercopy!"));
+  let pi=0;
+  CARDS.forEach(c=>{if(gfilter==="All"||c[0]===gfilter){pres[pi].textContent=c[3];pi++}});
+  document.querySelectorAll("#prompts button[data-i]").forEach(b=>b.onclick=()=>{const c=CARDS[+b.dataset.i];copyText(c[3],"Prompt "+c[1]+" tercopy!")});
+  document.querySelectorAll("#prompts button:not([data-i])").forEach(b=>{});
 }
+function setG(g){gfilter=g;renderPrompts()}
 render();renderPrompts();
 </script>
 
-<template id="p-style">
-STYLE SUFFIX (tempel di akhir SEMUA prompt):
-2d pixel art, HD-2D style, desaturated dark fantasy palette, gritty war-torn mood, dramatic contrast, clean silhouette readable at 1x size, solid flat colors, no gradients, no photorealistic details, no blur, no watermark, transparent background
-PALET: #4A6B8A ash blue, #8B2500 blood red, #E8DCC8 bone, #3D1F5C shadow purple, #3A5F3A forest green, #6B7B8D steel, #C5A345 gold, #2A7A6E blight teal, #6B4226 brown, #1A1A2E deep black, glow #7FFFD4/#FF6B35/#87CEEB/#FFD700
-MIDJOURNEY: --ar 1:1 --style raw --stylize 250 --v 6 --no blur, watermark, text, photorealistic (+ --sref url-Kael utk konsistensi)
-SD: checkpoint pixel-art, DPM++ 2M Karras 25 steps, CFG 6, ukuran kelipatan 32/48/64. Negative: blurry, photorealistic, watermark, text, gradient, deformed, extra limbs
-ATURAN: 1 aset=1 PNG transparan | ukuran EXACT | water/blight 2 frame (beda ripple/vein saja) | nama file EXACT | &lt;200KB
-</template>
-<template id="p-char">
-KAEL → char_Sword_4A6B8A.png (32x48):
-2d pixel art game sprite, male squire age 22, short messy ash-grey hair, pale blue tired eyes, burn scar on neck, worn dark brown leather chestpiece over chainmail collar, tattered dark grey cloak torn left shoulder, dented iron bracers, muddy boots, holding chipped iron short sword down-right, steel-blue shoulder trim, full body front-facing idle battle stance, +STYLE
-BRIAR → char_Axe_4A6B8A.png: fierce female warrior 28, long braided auburn hair, amber eyes, cheek scar, dark grey steel armor red accents, wolf fur collar, heavy pauldrons, war axe on shoulder, steel-blue trim, idle stance, +STYLE
-SERA → char_Staff_4A6B8A.png: gentle female healer 19, long straight platinum blonde hair, violet eyes, white-gold robes, wooden staff glow, headdress, steel-blue sash, gentle pose, +STYLE
-VOSS → char_Bow_4A6B8A.png: quiet male ranger 25, green-brown shoulder hair, sharp green eyes, green jerkin + hooded leaf cloak, longbow left, quiver, steel-blue fletching, idle stance, +STYLE
-Strip: nama `anim_&lt;Id&gt;_&lt;clip&gt;.png`, frame 32x48, seed sama dari idle, cukup 1 arah (engine flip otomatis).
-ANIM per hero (strip horizontal frame 32x48, seed sama dari idle): anim_&lt;Id&gt;_idle(2f napas) walk(4f) attack(4f) skill(4f + efek) hit(2f flinch) death(4f collapse). Id=Kael/Briar/Sera/Voss
-PORTRAIT 128x128 bust: portrait_&lt;Nama&gt;[_battle,_sad,_happy]. Pola: portrait bust, [ciri ART_BRIEF], dramatic rim light, muted palette, centered 3/4, dark vignette, no text. Kael stoic frown / Briar smirk / Sera warm smile / Voss bored neutral.
-</template>
-<template id="p-ene">
-BANDIT+SKELETON → char_Sword_8B2500.png: desperate hooded bandit, mismatched dented armor brown grey, rusty short sword, red sash, menacing idle, +STYLE. Strip: anim_Bandit_idle(2) walk(4 skulking) attack(4 wild slash) hit(2) death(4)
-GOBLIN(+Wolf/Skeleton temp) → char_Dagger_8B2500.png: small green goblin, big ears, hunched, sharp teeth, crude knife, brown rags, red war-paint, feral idle, +STYLE. Strip anim_Goblin_* sama pola (walk scamper, attack leaping stab, hit squash, death poof)
-CULTIST → char_Tome_8B2500.png: hooded cultist, dark purple robe, spider sigil, chained floating grimoire, purple glow eyes, chanting pose, +STYLE. Strip anim_Cultist_* (+skill: void tendrils)
-</template>
-<template id="p-tile">
-Diamond 64x48, bevel terang atas + outline gelap. Pola: isometric diamond game tile top-down 2:1, MOTIF, seamless edges, +STYLE
-dia_59724C plains (worn grass) | dia_59724C_alt (varian) | dia_3A5E3A forest floor | dia_6B6B72 rock slabs | bridge (planks+rails) | ruin (cracked slabs) | water0/water1 (ripple geser) | blight0/blight1 (vein menebal)
-tree 48x64 | rock 40x32 | wall 64x64 | tuft 24x16 | shadow 32x12
-</template>
-<template id="p-bg">
-bg_title.png 960x540: dark fantasy key art, ruined castle silhouette, embers, fire horizon, swordsman back-view, painterly, no text
-bg_map.png 1024: aged parchment world map, 5 regions, compass rose, dotted routes, burnt edges, no text labels
-bg_base.png 960x540: bastion stone hall, war table, weapon racks, chapel candles, forge embers, no people no text
-</template>
-<template id="p-ico">
-Pola 32x32: fantasy RPG skill icon, MOTIF, WARNA, centered emblem, thick dark outline, flat colors, transparent, no text, +STYLE
-SKILL: icon_Attack (crossed sword) Talk (bubble+eye) PowerStrike (cleave burst) ShieldBash (shield+stars) WarCry (helm shout) Pierce (spear) AimedShot (arrow+crosshair) QuickShot (3 arrows) HealingLight (hand swirl) Smite (holy hammer) Cure (droplet) Skill (sparks) Item (pouch) Wait (hourglass)
-CONSUMABLE: icon_potion hi_potion ether antidote phoenix_down bomb elixir tent
-GEAR: icon_iron_sword hand_axe wooden_staff short_bow rusty_sword leather_armor iron_helm power_band
-Target: Assets/Resources/Art/Icons/
-Pola nama: `icon_&lt;id skill/item/gear&gt;`.
-</template>
-<template id="p-area">
-PROPS Ch.1 (pivot center-bawah): deco_house 64x96 (burnt house + chimney + embers, tile 3,2) | deco_debris0/1/2 48x32 (cart wheel / rubble / beam, tile ruins) | deco_deadtree 48x64 (black leafless tree, plains acak). Prompt: burnt war-torn village prop, MOTIF, dark fantasy, muted palette, isometric asset, transparent, +STYLE. File hilang = fallback diam.
-SKILL Ch.1: ikon Attack/Talk/PowerStrike + engine kasih hit-flash + damage number (tanpa art).
-MENU: bg_title/bg_map tampil otomatis; portrait_Kael/Briar tampil di dialogue + info unit + equip.
-Thumbnail unit: `portrait_&lt;RosterId&gt;`, fallback kotak huruf bila file belum ada.
-</template>
+
+
+
+
+
+
+
 </body>
 </html>
