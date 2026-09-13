@@ -61,12 +61,12 @@
 
 ### Menu sinematik (spec: prompts/phase1/menu_cinematic.md — engine SUDAH SIAP)
 
-- [ ] `bg_title_0.png` Ashfield terbakar
-- [ ] `bg_title_1.png` Gerbang Bastion
-- [ ] `bg_title_2.png` Blight Heart
-- [ ] `bg_title_3.png` Siluet party
-- [ ] `logo_garganta.png` 800x256 transparan
-- [ ] Musik tema 90 detik (timpa `title.ogg`)
+- [x] `bg_title_0.png` Ashfield terbakar
+- [x] `bg_title_1.png` Gerbang Bastion
+- [x] `bg_title_2.png` Blight Heart
+- [x] `bg_title_3.png` Siluet party
+- [x] `logo_garganta.png` transparan (keying checkerboard)
+- [x] Musik tema 90 detik "Ashen Crown" (compress quad→stereo 1.3MB)
 
 ### Icons 32x32 (`Assets/Resources/Art/Icons/`)
 

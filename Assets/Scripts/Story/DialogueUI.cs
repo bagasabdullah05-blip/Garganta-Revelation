@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Garganta.UI;
 
 namespace Garganta.Story
 {
@@ -132,11 +133,13 @@ namespace Garganta.Story
             GUILayout.BeginVertical();
             if (!string.IsNullOrEmpty(speaker))
             {
-                GUI.color = SpeakerColor(speaker);
-                GUILayout.Label(speaker);
-                GUI.color = Color.white;
+                var sstyle = UITheme.Speaker();
+                var old = sstyle.normal.textColor;
+                sstyle.normal.textColor = SpeakerColor(speaker);
+                GUILayout.Label(speaker, sstyle);
+                sstyle.normal.textColor = old;
             }
-            GUILayout.Label(text.Substring(0, n));
+            GUILayout.Label(text.Substring(0, n), UITheme.BodyText());
             GUILayout.EndVertical();
             GUILayout.EndHorizontal();
             GUILayout.BeginHorizontal();

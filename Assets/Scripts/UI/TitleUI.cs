@@ -50,7 +50,9 @@ namespace Garganta.UI
             var r = new Rect(Screen.width / 2 - 180, Screen.height / 2 - 160, 360, 320);
             GUILayout.BeginArea(r, "box");
             var title = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 26, fontStyle = FontStyle.Bold };
-            var sub = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
+            if (UITheme.Display() != null) title.font = UITheme.Display();
+            title.normal.textColor = UITheme.Gold;
+            var sub = UITheme.Center(13);
             var logo = Garganta.Art.UiArt.Bg("logo");
             if (logo != null)
             {
@@ -66,7 +68,7 @@ namespace Garganta.UI
             GUILayout.Space(12);
             if (!pickDiff)
             {
-                if (GUILayout.Button("New Game", GUILayout.Height(36))) pickDiff = true;
+                if (GUILayout.Button("New Game", UITheme.MenuButton(), GUILayout.Height(36))) pickDiff = true;
             }
             else
             {
@@ -74,16 +76,16 @@ namespace Garganta.UI
                 for (int d = 0; d < 4; d++)
                 {
                     int diff = d;
-                    if (GUILayout.Button($"{GameBalance.Name(diff)} (foe x{GameBalance.EnemyStatMult(diff)}, XP x{GameBalance.XpMult(diff)})"))
+                    if (GUILayout.Button($"{GameBalance.Name(diff)} (foe x{GameBalance.EnemyStatMult(diff)}, XP x{GameBalance.XpMult(diff)})", UITheme.MenuButton()))
                     {
                         pickDiff = false;
                         flow.NewGame(diff);
                     }
                 }
-                if (GUILayout.Button("Back")) pickDiff = false;
+                if (GUILayout.Button("Back", UITheme.MenuButton())) pickDiff = false;
             }
             GUI.enabled = SaveSystem.SlotExists(SaveSystem.LastSlot) || SaveSystem.SlotExists(1);
-            if (GUILayout.Button("Continue", GUILayout.Height(32))) flow.ContinueGame();
+            if (GUILayout.Button("Continue", UITheme.MenuButton(), GUILayout.Height(32))) flow.ContinueGame();
             GUI.enabled = true;
             GUILayout.Label("Load slot:", sub);
             GUILayout.BeginHorizontal();
@@ -91,7 +93,7 @@ namespace Garganta.UI
             {
                 int slot = s;
                 GUI.enabled = SaveSystem.SlotExists(slot);
-                if (GUILayout.Button($"Slot {slot}")) flow.LoadSlot(slot);
+                if (GUILayout.Button($"Slot {slot}", UITheme.MenuButton())) flow.LoadSlot(slot);
             }
             GUI.enabled = true;
             GUILayout.EndHorizontal();
