@@ -51,3 +51,11 @@ flat colors, transparent background, no text no letters,
 | `icon_leather_armor.png` | leather cuirass |
 | `icon_iron_helm.png` | iron helmet |
 | `icon_power_band.png` | red armband, gold trim |
+
+## Menu (4, tombol utama battle)
+
+| Target | MOTIF, WARNA |
+|---|---|
+| `icon_Skill.png` | crossed sparks, cyan |
+| `icon_Item.png` | leather pouch, brown |
+| `icon_Wait.png` | hourglass, bone white |

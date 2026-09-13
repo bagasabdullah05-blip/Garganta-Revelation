@@ -83,6 +83,8 @@ namespace Garganta.Units
                 else unit.Behavior = AIBehavior.Aggressive;
             }
             go.AddComponent<UnitMovement>();
+            var anim = go.AddComponent<UnitAnimator>();
+            anim.Setup(id, sr.sprite);
             go.AddComponent<HealthBarUI>();
             grid.Tiles[coord.x, coord.y].Occupant = unit;
             return unit;
@@ -130,6 +132,8 @@ namespace Garganta.Units
             shSort.Offset = -1;
 
             go.AddComponent<UnitMovement>();
+            var animSave = go.AddComponent<UnitAnimator>();
+            animSave.Setup(save.rosterId, sr.sprite);
             go.AddComponent<HealthBarUI>();
             grid.Tiles[coord.x, coord.y].Occupant = unit;
             return unit;

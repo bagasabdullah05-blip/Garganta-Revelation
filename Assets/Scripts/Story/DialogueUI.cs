@@ -117,9 +117,18 @@ namespace Garganta.Story
             GUILayout.BeginArea(new Rect(40, Screen.height - 190, Screen.width - 280, 150));
             GUILayout.BeginVertical("box");
             GUILayout.BeginHorizontal();
-            GUI.color = SpeakerColor(speaker);
-            GUILayout.Box(string.IsNullOrEmpty(speaker) ? "?" : speaker.Substring(0, 1), GUILayout.Width(44), GUILayout.Height(44));
-            GUI.color = Color.white;
+            var portrait = Garganta.Art.UiArt.Portrait(speaker);
+            if (portrait != null)
+            {
+                var pr = GUILayoutUtility.GetRect(56, 56, GUILayout.Width(56), GUILayout.Height(56));
+                GUI.DrawTexture(pr, portrait.texture, ScaleMode.ScaleToFit);
+            }
+            else
+            {
+                GUI.color = SpeakerColor(speaker);
+                GUILayout.Box(string.IsNullOrEmpty(speaker) ? "?" : speaker.Substring(0, 1), GUILayout.Width(44), GUILayout.Height(44));
+                GUI.color = Color.white;
+            }
             GUILayout.BeginVertical();
             if (!string.IsNullOrEmpty(speaker))
             {

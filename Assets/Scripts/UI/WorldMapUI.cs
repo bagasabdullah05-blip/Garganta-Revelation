@@ -13,6 +13,8 @@ namespace Garganta.UI
             var save = SaveSystem.Current;
             if (save == null) return;
 
+            var bg = Garganta.Art.UiArt.Bg("map");
+            if (bg != null) GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), bg, ScaleMode.ScaleAndCrop);
             GUILayout.BeginArea(new Rect(20, 20, 340, Screen.height - 40));
             GUILayout.BeginVertical("box");
             GUILayout.Label("WORLD MAP — Act I");

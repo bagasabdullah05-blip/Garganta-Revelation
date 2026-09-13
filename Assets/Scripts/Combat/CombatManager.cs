@@ -100,6 +100,12 @@ namespace Garganta.Combat
                 : PhysicalBase(attacker.Stats.ATK + attacker.BuffAtk, attacker.Stats.WeaponMult * power, attacker.Stats.ClassMult, effDef);
 
             float variance = Random.Range(0.9f, 1.1f);
+            var aa = attacker.GetComponent<Garganta.Art.UnitAnimator>();
+            if (aa != null)
+            {
+                aa.SetFacing(defender.transform.position.x - attacker.transform.position.x);
+                if (magical) aa.PlaySkill(); else aa.PlayAttack();
+            }
             bool crit = Random.value < 0.1f; // M2 flat 10% crit (Dagger first-strike in M4)
             float hit = HitChance(attacker.Stats.Acc, effEva, WeaponTriangle.TriangleAccBonus(attacker.Stats.Weapon, defender.Stats.Weapon), elevAcc);
 
@@ -116,6 +122,8 @@ namespace Garganta.Combat
             dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * atkMult));
             defender.TakeDamage(dmg);
             if (!defender.IsAlive) Sfx("death");
+            var da = defender.GetComponent<Garganta.Art.UnitAnimator>();
+            if (da != null) { if (defender.IsAlive) da.PlayHit(); else da.PlayDeath(); }
             EventBus.Damage(attacker.UnitName, dmg, defender.UnitName);
             EventBus.Log($"{attacker.UnitName} hit {defender.UnitName} for {dmg}{(crit ? " CRIT" : "")}");
 

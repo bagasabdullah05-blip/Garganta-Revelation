@@ -12,8 +12,15 @@ namespace Garganta.UI
             if (gm == null) return;
             Unit u = gm.SelectedUnit ?? gm.CurrentUnit;
             if (u == null) return;
-            GUILayout.BeginArea(new Rect(8, Screen.height - 130, 320, 122));
-            GUILayout.BeginVertical("box");
+            GUILayout.BeginArea(new Rect(8, Screen.height - 130, 380, 122));
+            GUILayout.BeginHorizontal("box");
+            var face = Garganta.Art.UiArt.Portrait(u.RosterId);
+            if (face != null)
+            {
+                var fr = GUILayoutUtility.GetRect(56, 56, GUILayout.Width(56), GUILayout.Height(56));
+                GUI.DrawTexture(fr, face.texture, ScaleMode.ScaleToFit);
+            }
+            GUILayout.BeginVertical();
             GUILayout.Label($"{u.UnitName} [{u.ClassId} Lv{u.Level}/J{u.JobLevelOf(u.ClassId)}]  HP {u.HP}/{u.Stats.MaxHP}  MP {u.MP}/{u.Stats.MaxMP}");
             GUILayout.Label($"ATK {u.Stats.ATK} DEF {u.Stats.DEF} MAG {u.Stats.MAG} SPD {u.Stats.SPD} Move {u.Stats.Move} Rng {u.Stats.Range}");
             string status = u.StunTurns > 0 ? "STUNNED " : "";
@@ -21,6 +28,7 @@ namespace Garganta.UI
             if (u.BuffTurns > 0) status += $"BUFF+{u.BuffAtk}/{u.BuffDef}/{u.BuffEva}/{u.BuffMag}({u.BuffTurns}) ";
             GUILayout.Label($"CTB {u.CTB:0}/100  {u.Stats.Weapon}  {status}");
             GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
             GUILayout.EndArea();
         }
     }

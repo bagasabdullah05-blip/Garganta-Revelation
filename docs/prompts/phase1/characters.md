@@ -1,63 +1,85 @@
-# Phase 1 — Heroes (4 sprite + 4 portrait)
+# Phase 1 — Heroes: full set (sprite + 6 klip anim + 4 portrait)
 
-Canvas sprite **32x48** (kaki di bawah, senjata kanan). Portrait **128x128**
-(bust, Bilinear OK). Detail full di `docs/ART_BRIEF.md §1`.
-Target: `Assets/Resources/Art/<nama>.png`.
+Setiap hero = **1 idle sprite + 6 strip anim + 4 portrait = 11 file**.
+Strip = PNG horizontal, frame 32x48, nama `anim_<Id>_<clip>.png`
+(Id = Kael/Briar/Sera/Voss, clip = idle/walk/attack/skill/hit/death).
+Engine putar otomatis; strip hilang = fallback sprite diam (game tetap jalan).
+Target: `Assets/Resources/Art/` (strip di `Anims/`).
 
-## 1. Kael → `char_Sword_4A6B8A.png`
+Aturan strip: pose & desain HARUS konsisten antar frame (pakai seed sama /
+img2img dari idle). Kiri-kanan cukup 1 arah — engine flip otomatis.
 
-```
-2d pixel art game sprite, male squire age 22, short messy ash-grey hair,
-pale blue tired eyes, burn scar on neck, worn dark brown leather chestpiece
-over chainmail collar, tattered dark grey cloak torn left shoulder, dented
-iron bracers, muddy boots, holding chipped iron short sword down-right,
-steel-blue shoulder trim, full body front-facing idle battle stance,
-<STYLE>
-```
+## Base prompt (tempel <STYLE> dari STYLE.md di tiap prompt)
 
-## 2. Briar → `char_Axe_4A6B8A.png`
+Ganti [KLIP] dengan baris klip di bawah. Base per hero sama dengan file
+sebelumnya (32x48, kaki bawah, senjata kanan, trim steel-blue).
 
-```
-2d pixel art game sprite, fierce female warrior age 28, long braided auburn
-hair, amber eyes, scar right cheek, dark grey steel armor red accents,
-wolf fur collar, heavy pauldrons, war axe resting on shoulder, steel-blue
-shoulder trim, full body front-facing idle battle stance,
-<STYLE>
-```
+## Kael — Squire (`char_Sword_4A6B8A.png` + `anim_Kael_*.png`)
 
-## 3. Sera → `char_Staff_4A6B8A.png`
+Base: male squire 22, messy ash-grey hair, pale blue tired eyes, neck burn
+scar, brown leather + chainmail, tattered grey cloak, iron bracers, chipped
+short sword.
 
-```
-2d pixel art game sprite, gentle female healer age 19, long straight platinum
-blonde hair, soft violet eyes, white robes gold trim holy chest symbol,
-wooden staff with soft glow, white headdress, healing pouch, steel-blue
-sash trim, full body front-facing idle gentle pose,
-<STYLE>
-```
+| Klip | Frame | Prompt delta |
+|---|---|---|
+| `idle` | 2 | standing guard, subtle breath, sword lowered |
+| `walk` | 4 | walk cycle left-to-right, cloak sway, sword bob |
+| `attack` | 4 | horizontal slash, wind-up → strike → recover |
+| `skill` | 4 | overhead holy slash + light burst (boleh glow) |
+| `hit` | 2 | flinch back, hand to chest |
+| `death` | 4 | kneel → collapse, staring at hand (Blight marks) |
 
-## 4. Voss → `char_Bow_4A6B8A.png`
+## Briar — Warrior (`char_Axe_4A6B8A.png` + `anim_Briar_*.png`)
 
-```
-2d pixel art game sprite, quiet male ranger age 25, shoulder dark
-green-brown hair, sharp green eyes, green leather jerkin Valenwood pattern,
-hooded forest cloak leaf motif, composite longbow held left, quiver arrows
-on back, silent boots, steel-blue arrow fletching trim, full body
-front-facing idle stance,
-<STYLE>
-```
+Base: female warrior 28, braided auburn hair, amber eyes, cheek scar,
+grey-red steel armor, fur collar, war axe.
 
-## Portraits (dialogue, bust shot, painterly boleh)
+| Klip | Frame | Prompt delta |
+|---|---|---|
+| `idle` | 2 | confident stance, axe butt on ground |
+| `walk` | 4 | heavy armored march |
+| `attack` | 4 | overhead axe swing, full body twist |
+| `skill` | 4 | shield-less war cry slash + red burst |
+| `hit` | 2 | stagger, teeth grit |
+| `death` | 4 | fall to knees, axe planted |
 
-Prompt pola (ganti nama + ciri, target `portrait_<Nama>.png` 128x128):
+## Sera — Acolyte (`char_Staff_4A6B8A.png` + `anim_Sera_*.png`)
 
-```
-2d pixel art portrait bust, <ciri wajah persis ART_BRIEF §1>,
-dark fantasy, dramatic rim light, muted desaturated palette,
-dialogue portrait, centered face, 3/4 view,
-<STYLE minus "transparent background" → pakai "dark vignette background">
-```
+Base: female healer 19, platinum straight hair, violet eyes, white-gold robes,
+wooden staff, headdress.
 
-- `portrait_Kael.png` — 22 male, ash-grey messy hair, pale blue tired eyes, neck burn scar, stoic frown
-- `portrait_Briar.png` — 28 female, braided auburn hair, amber fierce eyes, cheek scar, confident smirk
-- `portrait_Sera.png` — 19 female, platinum straight hair, violet gentle eyes, warm compassionate smile
-- `portrait_Voss.png` — 25 male, green-brown shoulder hair, sharp green eyes, neutral bored look
+| Klip | Frame | Prompt delta |
+|---|---|---|
+| `idle` | 2 | gentle hover-sway, staff upright |
+| `walk` | 4 | graceful glide walk, robes flow |
+| `attack` | 2 | reluctant staff poke (lemah, sesuai lore) |
+| `skill` | 4 | staff raised, green-gold swirl particles |
+| `hit` | 2 | startled step back |
+| `death` | 4 | sink down, staff falling |
+
+## Voss — Archer (`char_Bow_4A6B8A.png` + `anim_Voss_*.png`)
+
+Base: male ranger 25, green-brown shoulder hair, sharp green eyes, green
+jerkin + hooded leaf cloak, longbow, quiver.
+
+| Klip | Frame | Prompt delta |
+|---|---|---|
+| `idle` | 2 | relaxed alert, bow lowered |
+| `walk` | 4 | light careful ranger stride |
+| `attack` | 4 | quick draw → aim → release |
+| `skill` | 4 | piercing shot, arrow glow, big impact pose |
+| `hit` | 2 | sidestep wince |
+| `death` | 4 | crumple, quiver spilling arrows |
+
+## Portraits 128x128 (`portrait_<Nama>[_<expr>].png`, painterly boleh)
+
+Ekspresi per hero: normal (fallback `portrait_<Nama>.png`), `battle`,
+`sad`, `happy`. Stretch: `corruption` (mata glow teal + urat — tampil saat
+Blight ≥50%, wiring P2).
+
+Pola: `2d pixel art portrait bust, [CIRI ART_BRIEF §1 + EKSPRESI],
+dramatic rim light, muted palette, centered 3/4 view, dark vignette, no text`
+- Kael: normal stoic frown / battle yell / sad eyes closed / rare small smile
+- Briar: normal smirk / battle shout / sad jaw clenched / genuine laugh
+- Sera: normal warm smile / battle chanting focus / tearful / bright hopeful
+- Voss: normal bored neutral / battle sharp focus / sarcastic smirk / serious squint

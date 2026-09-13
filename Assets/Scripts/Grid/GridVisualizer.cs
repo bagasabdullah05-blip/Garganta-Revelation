@@ -106,7 +106,25 @@ namespace Garganta.Grid
             switch (t.Type)
             {
                 // Forest/Mountain art already includes tree/peak — no separate deco.
+                // Ruins/plains props (Ch.1 Ashfield): silent skip when art missing.
+                case TileType.Ruins:
+                    {
+                        if (t.Coord.x == 3 && t.Coord.y == 2)
+                        {
+                            var house = ArtOverride.Get("deco_house");
+                            if (house != null) { deco = house; off = new Vector3(0, 0.5f, 0); break; }
+                        }
+                        string[] rubble = { "deco_debris0", "deco_debris1", "deco_debris2" };
+                        var d = ArtOverride.Get(rubble[(t.Coord.x * 3 + t.Coord.y * 5) % 3]);
+                        if (d != null) { deco = d; off = Vector3.zero; }
+                    }
+                    break;
                 case TileType.Plains:
+                    if ((t.Coord.x * 7 + t.Coord.y * 13) % 11 == 0)
+                    {
+                        var dead = ArtOverride.Get("deco_deadtree");
+                        if (dead != null) { deco = dead; off = new Vector3(0, 0.3f, 0); break; }
+                    }
                     if ((t.Coord.x * 7 + t.Coord.y * 13) % 5 == 0) { deco = SpriteFactory.Tuft(); off = new Vector3(0.1f, 0.1f, 0); }
                     break;
             }

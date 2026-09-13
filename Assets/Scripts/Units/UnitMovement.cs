@@ -12,10 +12,13 @@ namespace Garganta.Units
 
         public IEnumerator FollowPath(List<Vector2Int> path, GridManager grid, Action onDone)
         {
+            var anim = GetComponent<Garganta.Art.UnitAnimator>();
+            if (anim != null) anim.PlayWalk(true);
             for (int i = 1; i < path.Count; i++)
             {
                 Vector3 from = transform.position;
                 Vector3 to = grid.TileTop(path[i]);
+                if (anim != null) anim.SetFacing(to.x - from.x);
                 float t = 0f;
                 while (t < 1f)
                 {
@@ -24,6 +27,7 @@ namespace Garganta.Units
                     yield return null;
                 }
             }
+            if (anim != null) anim.PlayWalk(false);
             onDone?.Invoke();
         }
     }

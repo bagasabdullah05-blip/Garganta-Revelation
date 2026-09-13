@@ -8,6 +8,12 @@ namespace Garganta.UI
     {
         int menu; // 0 main, 1 skills, 2 items
 
+        static GUIContent Btn(string iconId, string text)
+        {
+            var s = Garganta.Art.UiArt.Icon(iconId);
+            return s != null ? new GUIContent(text, s.texture) : new GUIContent(text);
+        }
+
         void OnGUI()
         {
             var gm = GameManager.Instance;
@@ -20,10 +26,10 @@ namespace Garganta.UI
             GUILayout.BeginArea(new Rect(Screen.width - 170, Screen.height - 170, 162, 162));
             GUILayout.BeginVertical("box");
             GUILayout.Label($"{u.UnitName} Lv{u.Level}");
-            if (GUILayout.Button("Attack")) gm.ShowAttackRange();
-            if (GUILayout.Button("Skill")) menu = 1;
-            if (GUILayout.Button("Item")) menu = 2;
-            if (GUILayout.Button("Wait")) gm.PlayerWait();
+            if (GUILayout.Button(Btn("Attack", "Attack"))) gm.ShowAttackRange();
+            if (GUILayout.Button(Btn("Skill", "Skill"))) menu = 1;
+            if (GUILayout.Button(Btn("Item", "Item"))) menu = 2;
+            if (GUILayout.Button(Btn("Wait", "Wait"))) gm.PlayerWait();
             GUILayout.EndVertical();
             GUILayout.EndArea();
         }
@@ -36,7 +42,7 @@ namespace Garganta.UI
             foreach (var sk in ClassDatabase.UnlockedSkillsFor(u))
             {
                 GUI.enabled = u.MP >= sk.CostMP;
-                if (GUILayout.Button($"{sk.Name} ({sk.CostMP})")) { gm.SelectSkill(sk); menu = 0; }
+                if (GUILayout.Button(Btn(sk.Id, $"{sk.Name} ({sk.CostMP})"))) { gm.SelectSkill(sk); menu = 0; }
             }
             GUI.enabled = true;
             if (GUILayout.Button("Back")) menu = 0;
@@ -54,7 +60,7 @@ namespace Garganta.UI
                 var item = EquipmentData.FindConsumable(kv.Key);
                 if (item.Id == null) continue;
                 GUI.enabled = kv.Value > 0;
-                if (GUILayout.Button($"{item.Name} x{kv.Value}")) { gm.SelectItem(item.Id); menu = 0; }
+                if (GUILayout.Button(Btn(item.Id, $"{item.Name} x{kv.Value}"))) { gm.SelectItem(item.Id); menu = 0; }
             }
             GUI.enabled = true;
             if (GUILayout.Button("Back")) menu = 0;

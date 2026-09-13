@@ -25,18 +25,33 @@
 - [x] `ruin.png` + `bridge.png` + `wall.png`
 - [x] Engine pindah layout 2:1 (row 0.5) + sorting depth
 
-### Heroes (sprite 32x48 + portrait 128)
+### Heroes (sprite 32x48 + 6 klip + 4 portrait — spec: prompts/phase1/characters.md)
 
-- [ ] `char_Sword_4A6B8A.png` Kael + `portrait_Kael.png`
-- [ ] `char_Axe_4A6B8A.png` Briar + `portrait_Briar.png`
-- [ ] `char_Staff_4A6B8A.png` Sera + `portrait_Sera.png`
-- [ ] `char_Bow_4A6B8A.png` Voss + `portrait_Voss.png`
+- [ ] Kael: sprite+idle, walk(4f)
+- [ ] Kael: attack(4f), skill(4f)
+- [ ] Kael: hit(2f), death(4f)
+- [ ] Kael portraits: normal, battle, sad, happy
+- [ ] Briar: sprite+idle, walk(4f)
+- [ ] Briar: attack(4f), skill(4f)
+- [ ] Briar: hit(2f), death(4f)
+- [ ] Briar portraits: normal, battle, sad, happy
+- [ ] Sera: sprite+idle, walk(4f)
+- [ ] Sera: attack(2f), skill(4f)
+- [ ] Sera: hit(2f), death(4f)
+- [ ] Sera portraits: normal, battle, sad, happy
+- [ ] Voss: sprite+idle, walk(4f)
+- [ ] Voss: attack(4f), skill(4f)
+- [ ] Voss: hit(2f), death(4f)
+- [ ] Voss portraits: normal, battle, sad, happy
 
-### Enemies Ch.1–Ch.2b
+### Enemies Ch.1–Ch.2b (spec: prompts/phase1/enemies.md)
 
-- [ ] `char_Sword_8B2500.png` Bandit/Skeleton
-- [ ] `char_Dagger_8B2500.png` Goblin (/Wolf sementara)
-- [ ] `char_Tome_8B2500.png` Cultist
+- [ ] Bandit: sprite+idle, walk(4f)
+- [ ] Bandit: attack(4f), hit(2f), death(4f)
+- [ ] Goblin: sprite+idle, walk(4f)
+- [ ] Goblin: attack(4f), hit(2f), death(4f)
+- [ ] Cultist: sprite+idle, walk(4f)
+- [ ] Cultist: attack(4f), skill(4f), hit(2f), death(4f)
 
 ### Backgrounds
 

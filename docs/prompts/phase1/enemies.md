@@ -1,36 +1,49 @@
-# Phase 1 — Enemies Ch.1–Ch.2b (3 file sprite, dipakai 5 musuh)
+# Phase 1 — Enemies: full set (3 file sprite + strip anim)
 
-Canvas **32x48** (Wolf 48x32, wide). Detail di `docs/ART_BRIEF.md §2`.
-Trim musuh SELALU blood-red accent. Target: `Assets/Resources/Art/<nama>.png`.
+Aturan strip sama dengan heroes (`anim_<Id>_<clip>.png`, frame 32x48,
+seed sama/img2img dari idle). File sprite dishare (lihat tabel).
+Target: `Assets/Resources/Art/` (strip di `Anims/`).
 
-> Wolf & Skeleton & Bandit & Goblin: hanya 3 file karena Wolf/Goblin share
-> `char_Dagger_8B2500`, Bandit/Skeleton share `char_Sword_8B2500`.
+> Wolf & Skeleton sementara share file (lihat tabel). File khusus
+> `anim_Wolf_*` 48x32 + mapping code = task P3.
 
-## 1. Bandit + Skeleton → `char_Sword_8B2500.png`
+## 1. Bandit + Skeleton — base `char_Sword_8B2500.png`, strip `anim_Bandit_*`
 
-```
-2d pixel art game sprite, desperate hooded bandit, mismatched dented armor
-brown grey, rusty short sword, red sash trim, full body front-facing
-menacing idle stance,
-<STYLE>
-```
+Base: desperate hooded bandit, mismatched dented armor brown grey, rusty
+short sword, red sash trim, menacing idle.
 
-## 2. Goblin + Wolf → `char_Dagger_8B2500.png`
+| Klip | Frame | Prompt delta |
+|---|---|---|
+| `idle` | 2 | shifting weight, blade twitch |
+| `walk` | 4 | skulking advance, hunched |
+| `attack` | 4 | wild slash combo |
+| `hit` | 2 | knocked back, hood slips |
+| `death` | 4 | collapse, sword clatter |
+(`skill` strip opsional — fallback attack.)
 
-```
-2d pixel art game sprite, small green goblin, big ears, hunched, sharp teeth,
-crude knife, brown rags, red war-paint trim, full body front-facing
-feral idle stance,
-<STYLE>
-```
-CATATAN: Wolf placeholder sementara pakai sprite ini sampai P3 (butuh
-`char_Wolf_8B2500.png` 48x32 + code mapping — task P3).
+## 2. Goblin (+Wolf/Skeleton temp) — base `char_Dagger_8B2500.png`, strip `anim_Goblin_*`
 
-## 3. Cultist → `char_Tome_8B2500.png`
+Base: small green goblin, big ears, hunched, sharp teeth, crude knife,
+brown rags, red war-paint.
 
-```
-2d pixel art game sprite, hooded cultist, dark purple robe black trim,
-spider sigil on chest, chained floating grimoire beside hand, glowing
-purple eyes in shadow, red trim, full body front-facing chanting pose,
-<STYLE>
-```
+| Klip | Frame | Prompt delta |
+|---|---|---|
+| `idle` | 2 | bouncing, ear twitch |
+| `walk` | 4 | scampering waddle |
+| `attack` | 4 | leaping stab |
+| `hit` | 2 | squashed flatten |
+| `death` | 4 | deflate + poof |
+
+## 3. Cultist — base `char_Tome_8B2500.png`, strip `anim_Cultist_*`
+
+Base: hooded cultist, dark purple robe, spider sigil, chained floating
+grimoire, purple glow eyes.
+
+| Klip | Frame | Prompt delta |
+|---|---|---|
+| `idle` | 2 | chanting sway, tome orbit |
+| `walk` | 4 | gliding steps, robes drag |
+| `attack` | 4 | dark bolt cast, hand glow |
+| `skill` | 4 | both hands up, void tendrils |
+| `hit` | 2 | recoil, hood shadow flicker |
+| `death` | 4 | crumple to ash, tome drops |

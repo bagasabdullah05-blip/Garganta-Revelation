@@ -12,6 +12,8 @@ namespace Garganta.UI
         {
             var flow = GameFlow.Instance;
             if (flow == null || flow.State != FlowState.Title) return;
+            var bg = Garganta.Art.UiArt.Bg("title");
+            if (bg != null) GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), bg, ScaleMode.ScaleAndCrop);
             var r = new Rect(Screen.width / 2 - 180, Screen.height / 2 - 160, 360, 320);
             GUILayout.BeginArea(r, "box");
             var title = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 26, fontStyle = FontStyle.Bold };

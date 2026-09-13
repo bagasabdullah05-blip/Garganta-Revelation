@@ -26,6 +26,8 @@ namespace Garganta.UI
             var save = SaveSystem.Current;
             if (save == null) return;
 
+            var bg = Garganta.Art.UiArt.Bg("base");
+            if (bg != null) GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), bg, ScaleMode.ScaleAndCrop);
             GUILayout.BeginArea(new Rect(20, 20, 560, Screen.height - 40));
             GUILayout.BeginVertical("box");
             GUILayout.Label($"BASTION — Gold: {Inventory.Gold}G");
@@ -76,7 +78,11 @@ namespace Garganta.UI
         {
             GUILayout.BeginHorizontal();
             foreach (var r in save.roster)
-                if (GUILayout.Button(r.rosterId)) selUnit = r.rosterId;
+            {
+                var face = Garganta.Art.UiArt.Portrait(r.rosterId);
+                var content = face != null ? new GUIContent(r.rosterId, face.texture) : new GUIContent(r.rosterId);
+                if (GUILayout.Button(content)) selUnit = r.rosterId;
+            }
             GUILayout.EndHorizontal();
             int i = save.roster.FindIndex(r => r.rosterId == selUnit);
             if (i < 0) { selUnit = save.roster[0].rosterId; return; }
@@ -89,7 +95,7 @@ namespace Garganta.UI
                 {
                     var e = EquipmentData.FindAny(oid);
                     if (e.Id == null || e.Slot != slot) continue;
-                    if (GUILayout.Button($"Equip {e.Name}")) { SwapGear(save, i, slot, oid); }
+                    if (GUILayout.Button(Btn(oid, $"Equip {e.Name}"))) { SwapGear(save, i, slot, oid); }
                 }
             }
         }
@@ -107,6 +113,12 @@ namespace Garganta.UI
             save.ownedEquip.AddRange(Inventory.OwnedEquip);
         }
 
+        static GUIContent Btn(string iconId, string text)
+        {
+            var s = Garganta.Art.UiArt.Icon(iconId);
+            return s != null ? new GUIContent(text, s.texture) : new GUIContent(text);
+        }
+
         void ShopTab(GameSave save)
         {
             GUILayout.Label("Consumables:");
@@ -114,7 +126,7 @@ namespace Garganta.UI
             {
                 var c = EquipmentData.FindConsumable(id);
                 GUI.enabled = Inventory.Gold >= c.Price;
-                if (GUILayout.Button($"{c.Name} ({c.Price}G) — {c.Desc} [x{Inventory.Count(id)}]"))
+                if (GUILayout.Button(Btn(id, $"{c.Name} ({c.Price}G) — {c.Desc} [x{Inventory.Count(id)}]")))
                     Inventory.TryBuyConsumable(id);
             }
             GUI.enabled = true;
@@ -134,7 +146,7 @@ namespace Garganta.UI
                 var e = EquipmentData.FindAny(id);
                 if (e.Id == null) continue;
                 GUI.enabled = Inventory.Gold >= e.Price;
-                if (GUILayout.Button($"{e.Name} ({e.Price}G)"))
+                if (GUILayout.Button(Btn(id, $"{e.Name} ({e.Price}G)")))
                     Inventory.TryBuyEquipment(e, save.ownedEquip);
             }
             GUI.enabled = true;

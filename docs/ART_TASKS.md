@@ -60,6 +60,11 @@ Decor: `tree rock wall tuft shadow`.
 Units: `char_<Weapon>_<TrimHTML>`, e.g. `char_Sword_4A6B8A` (player),
 `char_Axe_8B2500` (enemy). Weapons: Sword Axe Spear Bow Staff Tome Dagger.
 Trims: player `4A6B8A`, enemy `8B2500`.
+Animasi: strip horizontal `anim_<Id>_<clip>.png` di `Assets/Resources/Art/Anims/`
+(Id = Kael/Briar/Sera/Voss/Bandit/Goblin/Cultist, clip = idle/walk/attack/
+skill/hit/death), frame 32x48. Strip hilang = fallback sprite diam.
+Portrait: `portrait_<Nama>.png` (normal) + `portrait_<Nama>_{battle,sad,happy}.png`
+(+ `_corruption` stretch).
 
 Examples: redraw ONE file `Assets/Resources/Art/char_Sword_4A6B8A.png`
 (Kael) and he changes in-game next Play; everything else stays placeholder.
