@@ -59,6 +59,15 @@
 - [ ] `bg_map.png` 1024x1024
 - [ ] `bg_base.png` 960x540
 
+### Menu sinematik (spec: prompts/phase1/menu_cinematic.md — engine SUDAH SIAP)
+
+- [ ] `bg_title_0.png` Ashfield terbakar
+- [ ] `bg_title_1.png` Gerbang Bastion
+- [ ] `bg_title_2.png` Blight Heart
+- [ ] `bg_title_3.png` Siluet party
+- [ ] `logo_garganta.png` 800x256 transparan
+- [ ] Musik tema 90 detik (timpa `title.ogg`)
+
 ### Icons 32x32 (`Assets/Resources/Art/Icons/`)
 
 - [ ] Skill (11): Attack Talk PowerStrike ShieldBash WarCry Pierce AimedShot QuickShot HealingLight Smite Cure

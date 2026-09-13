@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using Garganta.Data;
 using Garganta.Flow;
@@ -8,18 +9,59 @@ namespace Garganta.UI
     {
         bool pickDiff;
 
+        public const int SlideCount = 4;
+        public const float SlideSecs = 8f;
+        public const float FadeSecs = 1.5f;
+
+        public static int SlideIndex(float time, int count, float per)
+            => count <= 0 || per <= 0 ? 0 : (int)(time / per) % count;
+
+        public static float SlideBlend(float time, float per, float fade)
+        {
+            if (per <= 0 || fade <= 0) return 0f;
+            return Mathf.Clamp01(((time % per) - (per - fade)) / fade);
+        }
+
         void OnGUI()
         {
             var flow = GameFlow.Instance;
             if (flow == null || flow.State != FlowState.Title) return;
             var bg = Garganta.Art.UiArt.Bg("title");
-            if (bg != null) GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), bg, ScaleMode.ScaleAndCrop);
+            var slides = new List<Texture2D>();
+            for (int i = 0; i < SlideCount; i++)
+            {
+                var s = Garganta.Art.UiArt.Bg("title_" + i);
+                if (s != null) slides.Add(s);
+            }
+            var full = new Rect(0, 0, Screen.width, Screen.height);
+            if (slides.Count > 0)
+            {
+                int idx = SlideIndex(Time.time, slides.Count, SlideSecs);
+                GUI.DrawTexture(full, slides[idx], ScaleMode.ScaleAndCrop);
+                float a = SlideBlend(Time.time, SlideSecs, FadeSecs);
+                if (a > 0f)
+                {
+                    GUI.color = new Color(1, 1, 1, a);
+                    GUI.DrawTexture(full, slides[(idx + 1) % slides.Count], ScaleMode.ScaleAndCrop);
+                    GUI.color = Color.white;
+                }
+            }
+            else if (bg != null) GUI.DrawTexture(full, bg, ScaleMode.ScaleAndCrop);
             var r = new Rect(Screen.width / 2 - 180, Screen.height / 2 - 160, 360, 320);
             GUILayout.BeginArea(r, "box");
             var title = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 26, fontStyle = FontStyle.Bold };
             var sub = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter };
-            GUILayout.Label("GARGANTA", title);
-            GUILayout.Label("REVELATION", title);
+            var logo = Garganta.Art.UiArt.Bg("logo");
+            if (logo != null)
+            {
+                var lr = GUILayoutUtility.GetRect(320, 100, GUILayout.Width(320), GUILayout.Height(100));
+                GUI.DrawTexture(lr, logo, ScaleMode.ScaleToFit);
+            }
+            else
+            {
+                GUILayout.Label("GARGANTA", title);
+                GUILayout.Label("REVELATION", title);
+            }
             GUILayout.Label("Dark Fantasy Tactical RPG — Act I", sub);
             GUILayout.Space(12);
             if (!pickDiff)
