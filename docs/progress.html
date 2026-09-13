@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Garganta Revelation — Progress & Prompt Pack</title>
+<style>
+  :root{
+    --bg:#1A1A2E; --panel:#23233A; --panel2:#2B2B45;
+    --gold:#C5A345; --teal:#2A7A6E; --aether:#7FFFD4;
+    --ink:#E8DCC8; --dim:#9a94a8; --red:#8B2500; --blue:#4A6B8A;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:Segoe UI,system-ui,sans-serif;margin:0;padding:0 16px 60px}
+  header{position:sticky;top:0;background:var(--bg);padding:14px 0;border-bottom:2px solid var(--gold);z-index:10}
+  header h1{margin:0;font-size:22px;color:var(--gold);letter-spacing:2px}
+  header p{margin:4px 0 0;color:var(--dim);font-size:13px}
+  .bar{height:14px;background:#10101c;border:1px solid var(--gold);border-radius:7px;overflow:hidden;margin-top:8px}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--aether));width:0%}
+  nav{margin:14px 0;display:flex;gap:8px;flex-wrap:wrap}
+  nav button{background:var(--panel);color:var(--ink);border:1px solid var(--gold);border-radius:6px;padding:8px 14px;cursor:pointer}
+  nav button:hover{background:var(--panel2)}
+  section{background:var(--panel);border:1px solid #3a3a55;border-radius:10px;padding:14px 16px;margin:14px 0}
+  section h2{margin:0 0 4px;color:var(--gold);font-size:18px}
+  section h2 .pct{float:right;color:var(--aether);font-size:14px}
+  label.item{display:flex;gap:10px;align-items:flex-start;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:14px}
+  label.item:hover{background:var(--panel2)}
+  label.item input{transform:scale(1.3);margin-top:2px;accent-color:var(--aether)}
+  label.item.done span{color:var(--dim);text-decoration:line-through}
+  label.item code{color:var(--aether);font-size:12px}
+  .prompt{border:1px solid #3a3a55;border-radius:8px;margin:10px 0;overflow:hidden}
+  .prompt>div.head{display:flex;justify-content:space-between;align-items:center;background:var(--panel2);padding:8px 12px}
+  .prompt>div.head b{color:var(--gold)}
+  .prompt button{background:var(--teal);color:#fff;border:0;border-radius:6px;padding:6px 14px;cursor:pointer}
+  .prompt button:hover{filter:brightness(1.15)}
+  .prompt pre{margin:0;padding:12px;white-space:pre-wrap;font-size:12.5px;max-height:340px;overflow:auto;background:#141422}
+  .tools{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}
+  .tools button{background:var(--panel);color:var(--ink);border:1px solid var(--blue);border-radius:6px;padding:8px 14px;cursor:pointer}
+  footer{color:var(--dim);font-size:12px;margin-top:20px}
+  a{color:var(--aether)}
+</style>
+</head>
+<body>
+<header>
+  <h1>GARGANTA REVELATION</h1>
+  <p>Progress board + prompt pack Phase 1 &bull; centang tersimpan otomatis di browser ini &bull; mirror <code>docs/PROGRESS.md</code></p>
+  <div class="bar"><i id="allbar"></i></div>
+  <div id="alltxt" style="font-size:13px;color:var(--aether);margin-top:4px"></div>
+  <nav>
+    <button onclick="show('board')">Checklist</button>
+    <button onclick="show('prompts')">Prompt pack</button>
+    <button onclick="exportMD()">Copy ringkasan ⧉</button>
+    <button onclick="resetAll()">Reset</button>
+  </nav>
+</header>
+
+<div id="board"></div>
+<div id="prompts" style="display:none"></div>
+
+<footer>File: <code>docs/progress.html</code> — buka langsung di browser (double-click), offline OK. Data centang: localStorage browser ini.</footer>
+
+<script>
+const SECTIONS=[
+{t:"P0 — Prototype (code)",items:[
+["p0a","Grid/CTB/combat + 99 tests",1],["p0b","6+6+4 jobs, ~70 skill, 74 equipment, shop, crafting",1],
+["p0c","15 chars, 12 chapters, bonds, recruit, corruption, reputation",1],
+["p0d","5 endings, NG+, skirmish, superboss, difficulty, save 3 slot",1],
+["p0e","Musik/SFX temp + automated playtests",1]]},
+{t:"P1 — Tiles (WIRED ✅)",items:[
+["t0","dia_59724C(+alt) plains checker",1],["t1","dia_3A5E3A forest (tree terintegrasi)",1],["t2","dia_6B6B72 mountain (peak terintegrasi)",1],["t3","water0+water1, blight0+blight1 animasi",1],["t4","ruin + bridge + wall",1],["t5","Engine layout 2:1 + sorting depth",1]]},
+{t:"P1 — Heroes (sprite+6 klip+4 portrait)",items:[
+["h-kael-s","Kael sprite+idle, walk"],["h-kael-a","Kael attack, skill"],["h-kael-d","Kael hit, death"],["h-kael-p","Kael portraits ×4"],
+["h-bri-s","Briar sprite+idle, walk"],["h-bri-a","Briar attack, skill"],["h-bri-d","Briar hit, death"],["h-bri-p","Briar portraits ×4"],
+["h-ser-s","Sera sprite+idle, walk"],["h-ser-a","Sera attack, skill"],["h-ser-d","Sera hit, death"],["h-ser-p","Sera portraits ×4"],
+["h-vos-s","Voss sprite+idle, walk"],["h-vos-a","Voss attack, skill"],["h-vos-d","Voss hit, death"],["h-vos-p","Voss portraits ×4"]]},
+{t:"P1 — Enemies Ch.1–2b",items:[
+["e-ban","Bandit sprite+idle, walk / attack, hit, death"],["e-gob","Goblin sprite+idle, walk / attack, hit, death"],
+["e-cul","Cultist sprite+idle, walk / attack, skill, hit, death"]]},
+{t:"P1 — Backgrounds + Props Ch.1",items:[
+["b0","bg_title 960x540"],["b1","bg_map 1024"],["b2","bg_base 960x540"],
+["p-house","deco_house + debris0/1/2 + deadtree (engine placement jadi)"]]},
+{t:"P1 — Icons 32x32 (Icons/)",items:[
+["i-sk","Skill ×11 (+Skill/Item/Wait menu)"],["i-co","Consumable ×8"],["i-ge","Gear ×8"]]},
+{t:"P1 — Wiring code",items:[
+["w0","icon tampil di tombol & daftar"],["w1","portrait di dialogue + info unit + equip"],["w2","bg title/map/base tampil"],["w3","Play Ch.1→Ch.2b nol placeholder"]]},
+{t:"P2 — Feel & Balance",items:[["p2a","Animasi code + sisa SFX"],["p2b","Tuning XP/job/boss"],["p2c","Bugfix playthrough"]]},
+{t:"P3 — Content Art",items:[["p3a","Heroes wave 2-3"],["p3b","Enemies set 2 + 3 boss"],["p3c","Prompt pack phase2"]]},
+{t:"P4 — Launch",items:[["p4a","Musik+SFX final"],["p4b","Mobile + lokalisasi + store"]]}
+];
+const LS="garganta_progress_v1";
+let state={};
+try{state=JSON.parse(localStorage.getItem(LS)||"{}")}catch(e){state={}}
+function save(){try{localStorage.setItem(LS,JSON.stringify(state))}catch(e){}}
+function val(id,d){return state[id]!==undefined?!!state[id]:!!d}
+function render(){
+  let T=0,D=0,html="";
+  SECTIONS.forEach((s,si)=>{
+    let d=0;s.items.forEach(it=>{T++;if(val(it[0],it[2])){D++;d++}});
+    html+=`<section><h2>${s.t}<span class="pct">${d}/${s.items.length}</span></h2>`;
+    s.items.forEach(it=>{
+      const on=val(it[0],it[2]);
+      html+=`<label class="item${on?" done":""}"><input type="checkbox" data-id="${it[0]}"${on?" checked":""}><span>${it[1]}</span></label>`;
+    });
+    html+="</section>";
+  });
+  document.getElementById("board").innerHTML=html;
+  const p=T?D/T*100:0;
+  document.getElementById("allbar").style.width=p+"%";
+  document.getElementById("alltxt").textContent=`Total ${D}/${T} (${p.toFixed(0)}%)`;
+  document.querySelectorAll("#board input").forEach(cb=>cb.onchange=()=>{state[cb.dataset.id]=cb.checked;save();render()});
+}
+function show(which){
+  document.getElementById("board").style.display=which==="board"?"":"none";
+  document.getElementById("prompts").style.display=which==="prompts"?"":"none";
+}
+function resetAll(){if(confirm("Reset semua centang?")){state={};save();render()}}
+function exportMD(){
+  let md="# Progress Garganta\n";
+  SECTIONS.forEach(s=>{md+=`\n## ${s.t}\n`;s.items.forEach(it=>{md+=`- [${val(it[0],it[2])?"x":" "}] ${it[1]}\n`})});
+  copyText(md,"Ringkasan tercopy!");
+}
+function copyText(t,msg){
+  const done=()=>alert(msg||"Tercopy!");
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(()=>fallback())}else fallback();
+  function fallback(){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done()}catch(e){}document.body.removeChild(ta)}
+}
+const PROMPTS=[
+["STYLE.md — tempel di tiap prompt","p-style"],
+["characters.md — heroes + portrait","p-char"],
+["enemies.md — Bandit/Goblin/Cultist","p-ene"],
+["tiles.md — diamond + decor","p-tile"],
+["backgrounds.md — title/map/base","p-bg"],
+["icons.md — skill/item/gear/menu","p-ico"],
+["areas_ch1.md — props + menu Ch.1","p-area"]];
+function renderPrompts(){
+  let html="";
+  PROMPTS.forEach(p=>{
+    const body=document.getElementById(p[1]).textContent;
+    html+=`<div class="prompt"><div class="head"><b>${p[0]}</b><button data-t="${p[1]}">Copy ⧉</button></div><pre></pre></div>`;
+  });
+  document.getElementById("prompts").innerHTML=html;
+  const pres=document.querySelectorAll("#prompts pre");
+  PROMPTS.forEach((p,i)=>{pres[i].textContent=document.getElementById(p[1]).textContent.trim()});
+  document.querySelectorAll("#prompts button").forEach(b=>b.onclick=()=>copyText(document.getElementById(b.dataset.t).textContent.trim(),"Prompt tercopy!"));
+}
+render();renderPrompts();
+</script>
+
+<template id="p-style">
+STYLE SUFFIX (tempel di akhir SEMUA prompt):
+2d pixel art, HD-2D style, desaturated dark fantasy palette, gritty war-torn mood, dramatic contrast, clean silhouette readable at 1x size, solid flat colors, no gradients, no photorealistic details, no blur, no watermark, transparent background
+PALET: #4A6B8A ash blue, #8B2500 blood red, #E8DCC8 bone, #3D1F5C shadow purple, #3A5F3A forest green, #6B7B8D steel, #C5A345 gold, #2A7A6E blight teal, #6B4226 brown, #1A1A2E deep black, glow #7FFFD4/#FF6B35/#87CEEB/#FFD700
+MIDJOURNEY: --ar 1:1 --style raw --stylize 250 --v 6 --no blur, watermark, text, photorealistic (+ --sref url-Kael utk konsistensi)
+SD: checkpoint pixel-art, DPM++ 2M Karras 25 steps, CFG 6, ukuran kelipatan 32/48/64. Negative: blurry, photorealistic, watermark, text, gradient, deformed, extra limbs
+ATURAN: 1 aset=1 PNG transparan | ukuran EXACT | water/blight 2 frame (beda ripple/vein saja) | nama file EXACT | &lt;200KB
+</template>
+<template id="p-char">
+KAEL → char_Sword_4A6B8A.png (32x48):
+2d pixel art game sprite, male squire age 22, short messy ash-grey hair, pale blue tired eyes, burn scar on neck, worn dark brown leather chestpiece over chainmail collar, tattered dark grey cloak torn left shoulder, dented iron bracers, muddy boots, holding chipped iron short sword down-right, steel-blue shoulder trim, full body front-facing idle battle stance, +STYLE
+BRIAR → char_Axe_4A6B8A.png: fierce female warrior 28, long braided auburn hair, amber eyes, cheek scar, dark grey steel armor red accents, wolf fur collar, heavy pauldrons, war axe on shoulder, steel-blue trim, idle stance, +STYLE
+SERA → char_Staff_4A6B8A.png: gentle female healer 19, long straight platinum blonde hair, violet eyes, white-gold robes, wooden staff glow, headdress, steel-blue sash, gentle pose, +STYLE
+VOSS → char_Bow_4A6B8A.png: quiet male ranger 25, green-brown shoulder hair, sharp green eyes, green jerkin + hooded leaf cloak, longbow left, quiver, steel-blue fletching, idle stance, +STYLE
+Strip: nama `anim_&lt;Id&gt;_&lt;clip&gt;.png`, frame 32x48, seed sama dari idle, cukup 1 arah (engine flip otomatis).
+ANIM per hero (strip horizontal frame 32x48, seed sama dari idle): anim_&lt;Id&gt;_idle(2f napas) walk(4f) attack(4f) skill(4f + efek) hit(2f flinch) death(4f collapse). Id=Kael/Briar/Sera/Voss
+PORTRAIT 128x128 bust: portrait_&lt;Nama&gt;[_battle,_sad,_happy]. Pola: portrait bust, [ciri ART_BRIEF], dramatic rim light, muted palette, centered 3/4, dark vignette, no text. Kael stoic frown / Briar smirk / Sera warm smile / Voss bored neutral.
+</template>
+<template id="p-ene">
+BANDIT+SKELETON → char_Sword_8B2500.png: desperate hooded bandit, mismatched dented armor brown grey, rusty short sword, red sash, menacing idle, +STYLE. Strip: anim_Bandit_idle(2) walk(4 skulking) attack(4 wild slash) hit(2) death(4)
+GOBLIN(+Wolf/Skeleton temp) → char_Dagger_8B2500.png: small green goblin, big ears, hunched, sharp teeth, crude knife, brown rags, red war-paint, feral idle, +STYLE. Strip anim_Goblin_* sama pola (walk scamper, attack leaping stab, hit squash, death poof)
+CULTIST → char_Tome_8B2500.png: hooded cultist, dark purple robe, spider sigil, chained floating grimoire, purple glow eyes, chanting pose, +STYLE. Strip anim_Cultist_* (+skill: void tendrils)
+</template>
+<template id="p-tile">
+Diamond 64x48, bevel terang atas + outline gelap. Pola: isometric diamond game tile top-down 2:1, MOTIF, seamless edges, +STYLE
+dia_59724C plains (worn grass) | dia_59724C_alt (varian) | dia_3A5E3A forest floor | dia_6B6B72 rock slabs | bridge (planks+rails) | ruin (cracked slabs) | water0/water1 (ripple geser) | blight0/blight1 (vein menebal)
+tree 48x64 | rock 40x32 | wall 64x64 | tuft 24x16 | shadow 32x12
+</template>
+<template id="p-bg">
+bg_title.png 960x540: dark fantasy key art, ruined castle silhouette, embers, fire horizon, swordsman back-view, painterly, no text
+bg_map.png 1024: aged parchment world map, 5 regions, compass rose, dotted routes, burnt edges, no text labels
+bg_base.png 960x540: bastion stone hall, war table, weapon racks, chapel candles, forge embers, no people no text
+</template>
+<template id="p-ico">
+Pola 32x32: fantasy RPG skill icon, MOTIF, WARNA, centered emblem, thick dark outline, flat colors, transparent, no text, +STYLE
+SKILL: icon_Attack (crossed sword) Talk (bubble+eye) PowerStrike (cleave burst) ShieldBash (shield+stars) WarCry (helm shout) Pierce (spear) AimedShot (arrow+crosshair) QuickShot (3 arrows) HealingLight (hand swirl) Smite (holy hammer) Cure (droplet) Skill (sparks) Item (pouch) Wait (hourglass)
+CONSUMABLE: icon_potion hi_potion ether antidote phoenix_down bomb elixir tent
+GEAR: icon_iron_sword hand_axe wooden_staff short_bow rusty_sword leather_armor iron_helm power_band
+Target: Assets/Resources/Art/Icons/
+Pola nama: `icon_&lt;id skill/item/gear&gt;`.
+</template>
+<template id="p-area">
+PROPS Ch.1 (pivot center-bawah): deco_house 64x96 (burnt house + chimney + embers, tile 3,2) | deco_debris0/1/2 48x32 (cart wheel / rubble / beam, tile ruins) | deco_deadtree 48x64 (black leafless tree, plains acak). Prompt: burnt war-torn village prop, MOTIF, dark fantasy, muted palette, isometric asset, transparent, +STYLE. File hilang = fallback diam.
+SKILL Ch.1: ikon Attack/Talk/PowerStrike + engine kasih hit-flash + damage number (tanpa art).
+MENU: bg_title/bg_map tampil otomatis; portrait_Kael/Briar tampil di dialogue + info unit + equip.
+Thumbnail unit: `portrait_&lt;RosterId&gt;`, fallback kotak huruf bila file belum ada.
+</template>
+</body>
+</html>
