@@ -49,7 +49,7 @@ namespace Garganta.UI
             else if (bg != null) GUI.DrawTexture(full, bg, ScaleMode.ScaleAndCrop);
             var r = new Rect(Screen.width / 2 - 180, Screen.height / 2 - 160, 360, 320);
             GUILayout.BeginArea(r, "box");
-            var title = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 26, fontStyle = FontStyle.Bold };
+            var title = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = 44, fontStyle = FontStyle.Bold };
             if (UITheme.Display() != null) title.font = UITheme.Display();
             title.normal.textColor = UITheme.Gold;
             var sub = UITheme.Center(13);

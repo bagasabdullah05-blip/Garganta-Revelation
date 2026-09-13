@@ -23,9 +23,9 @@ namespace Garganta.UI
             if (menu == 1) { SkillsMenu(gm, u); return; }
             if (menu == 2) { ItemsMenu(gm, u); return; }
 
-            GUILayout.BeginArea(new Rect(Screen.width - 170, Screen.height - 170, 162, 162));
+            GUILayout.BeginArea(new Rect(Screen.width - 270, Screen.height - 300, 254, 292));
             GUILayout.BeginVertical("box");
-            GUILayout.Label($"{u.UnitName} Lv{u.Level}");
+            GUILayout.Label($"{u.UnitName} Lv{u.Level}", UITheme.Center(20));
             if (GUILayout.Button(Btn("Attack", "Attack"))) gm.ShowAttackRange();
             if (GUILayout.Button(Btn("Skill", "Skill"))) menu = 1;
             if (GUILayout.Button(Btn("Item", "Item"))) menu = 2;
@@ -36,7 +36,7 @@ namespace Garganta.UI
 
         void SkillsMenu(GameManager gm, Units.Unit u)
         {
-            GUILayout.BeginArea(new Rect(Screen.width - 250, Screen.height - 300, 242, 292));
+            GUILayout.BeginArea(new Rect(Screen.width - 360, Screen.height - 420, 344, 412));
             GUILayout.BeginVertical("box");
             GUILayout.Label($"Skills (MP {u.MP}/{u.Stats.MaxMP})");
             foreach (var sk in ClassDatabase.UnlockedSkillsFor(u))
@@ -52,7 +52,7 @@ namespace Garganta.UI
 
         void ItemsMenu(GameManager gm, Units.Unit u)
         {
-            GUILayout.BeginArea(new Rect(Screen.width - 250, Screen.height - 300, 242, 292));
+            GUILayout.BeginArea(new Rect(Screen.width - 360, Screen.height - 420, 344, 412));
             GUILayout.BeginVertical("box");
             GUILayout.Label("Items");
             foreach (var kv in Inventory.Stock())

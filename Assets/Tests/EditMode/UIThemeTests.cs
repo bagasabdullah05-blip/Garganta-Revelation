@@ -17,9 +17,9 @@ public class UIThemeTests
     public void Styles_Built()
     {
         UITheme.Clear();
-        Assert.AreEqual(16, UITheme.MenuButton().fontSize);
-        Assert.AreEqual(14, UITheme.BodyText().fontSize);
-        Assert.AreEqual(15, UITheme.Speaker().fontSize);
+        Assert.AreEqual(22, UITheme.MenuButton().fontSize);
+        Assert.AreEqual(18, UITheme.BodyText().fontSize);
+        Assert.AreEqual(20, UITheme.Speaker().fontSize);
         Assert.AreEqual(TextAnchor.MiddleCenter, UITheme.Center().alignment);
     }
 }

@@ -43,11 +43,11 @@ namespace Garganta.UI
             {
                 menuButton = BaseButton();
                 if (Display() != null) menuButton.font = Display();
-                menuButton.fontSize = 16;
-                menuButton.normal.textColor = Gold;
-                menuButton.hover.textColor = Color.white;
-                menuButton.focused.textColor = Gold;
-                menuButton.active.textColor = Color.white;
+                menuButton.fontSize = 22;
+                menuButton.normal.textColor = Bone;
+                menuButton.hover.textColor = Gold;
+                menuButton.focused.textColor = Bone;
+                menuButton.active.textColor = Gold;
             }
             return menuButton;
         }
@@ -58,7 +58,7 @@ namespace Garganta.UI
             {
                 bodyLabel = BaseLabel();
                 if (Body() != null) bodyLabel.font = Body();
-                bodyLabel.fontSize = 14;
+                bodyLabel.fontSize = 18;
                 bodyLabel.normal.textColor = Bone;
                 bodyLabel.wordWrap = true;
             }
@@ -71,12 +71,12 @@ namespace Garganta.UI
             {
                 speakerLabel = BaseLabel();
                 if (BodyBold() != null) speakerLabel.font = BodyBold();
-                speakerLabel.fontSize = 15;
+                speakerLabel.fontSize = 20;
             }
             return speakerLabel;
         }
 
-        public static GUIStyle Center(int size = 14)
+        public static GUIStyle Center(int size = 16)
         {
             if (centerLabel == null) centerLabel = BaseLabel();
             centerLabel.alignment = TextAnchor.MiddleCenter;
