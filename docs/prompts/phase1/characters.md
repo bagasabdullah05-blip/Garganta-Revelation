@@ -16,7 +16,20 @@ sebelumnya (32x48, kaki bawah, senjata kanan, trim steel-blue).
 
 ## Kael — Squire (`char_Sword_4A6B8A.png` + `anim_Kael_*.png`)
 
-Base: male squire 22, messy ash-grey hair, pale blue tired eyes, neck burn
+### 🔒 LOCKED DESIGN (dari asset sheet user — acuan semua frame Kael berikutnya)
+
+- Rambut silver abu messy spiky medium; mata pale blue; kulit fair; stoic.
+- Cuirass kulit coklat tua segmented + straps/buckles + belt pouches;
+  chainmail di collar + sleeves; **pauldron biru-baja di KEDUA bahu** (ciri utama);
+  cloak abu gelap robek bahu kiri; celana gelap; boots coklat berlumpur;
+  bracers besi dented.
+- Pedang pendek besi chipped, dipegang point-down kanan.
+- Attack: horizontal slash + busur tebasan krem. Skill: slash naik + ledakan
+  cahaya kuning-putih besar. Hit: flinch tangan ke dada. Death: berlutut → collapse.
+- Portrait 4: normal stoic / battle yelling / sad mata tertutup menunduk /
+  happy senyum tipis.
+
+Base prompt (untuk aset yang belum ada): male squire 22, messy ash-grey hair, pale blue tired eyes, neck burn
 scar, brown leather + chainmail, tattered grey cloak, iron bracers, chipped
 short sword.
 
